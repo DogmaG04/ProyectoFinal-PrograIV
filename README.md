@@ -11,7 +11,7 @@ Sistema web para la gestión de un surtidor de gasolina. Permite registrar venta
 
 ## Prototipo
 
-> 🔗 [Ver prototipo en Figma](https://www.figma.com/proto/XXX) <!-- Reemplazar con el link real del prototipo -->
+> 🔗 [Ver prototipo en línea](https://prototipo-gestorgasolina.vercel.app/)
 
 ## Estructura del proyecto
 
