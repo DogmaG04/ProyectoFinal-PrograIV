@@ -13,17 +13,6 @@ Sistema web para la gestión de un surtidor de gasolina. Permite registrar venta
 
 > 🔗 [Ver prototipo en Figma](https://www.figma.com/proto/XXX) <!-- Reemplazar con el link real del prototipo -->
 
-## Herramientas
-
-| Herramienta | Uso |
-|-------------|-----|
-| **React** | Framework de frontend |
-| **Vite** | Bundler y servidor de desarrollo |
-| **Tailwind CSS** | Estilos CSS utility-first |
-| **React Router** | Navegación entre pantallas |
-| **pnpm** | Gestor de paquetes |
-| **Supabase** | Backend (PostgreSQL, Auth, Realtime) |
-
 ## Estructura del proyecto
 
 Ver documentación completa en [`docs/estructura.md`](docs/estructura.md)
