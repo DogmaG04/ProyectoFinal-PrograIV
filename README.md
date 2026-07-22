@@ -11,7 +11,7 @@ Sistema web para la gestión de un surtidor de gasolina. Permite registrar venta
 
 ## Deploy
 
-[![Prototipo](https://img.shields.io/badge/Acceso_al_Prototipo-1a1a2e?style=for-the-badge&logo=rocket&logoColor=white&labelColor=1a1a2e&color=16213e)](https://prototipo-gestorgasolina.vercel.app/)
+[![Prototipo](https://img.shields.io/badge/Acceso_al_Prototipo-1a1a2e?style=for-the-badge&logo=rocket&logoColor=white&labelColor=1a1a2e&color=16213e)](https://dogmag04.github.io/prototipos-pf/)
 [![Aplicación Real](https://img.shields.io/badge/Aplicación_Real-1a1a2e?style=for-the-badge&logo=vercel&logoColor=white&labelColor=1a1a2e&color=16213e)](https://tu-app-real.vercel.app)
 
 ## Estructura del proyecto
