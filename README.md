@@ -9,8 +9,10 @@
 
 Sistema web para la gestión de un surtidor de gasolina. Permite registrar ventas diarias, controlar el inventario de combustibles y visualizar reportes a través de un dashboard con gráficas.
 
-[![Prototipo](https://img.shields.io/badge/Acceso_al_Prototipo-00d4ff?style=for-the-badge&logo=figma&logoColor=white)](https://prototipo-gestorgasolina.vercel.app/)
-[![Aplicación Real](https://img.shields.io/badge/Aplicación_Real-00ff88?style=for-the-badge&logo=vercel&logoColor=black)](https://tu-app-real.vercel.app)
+## Deploy
+
+[![Prototipo](https://img.shields.io/badge/Acceso_al_Prototipo-1a1a2e?style=for-the-badge&logo=figma&logoColor=white&labelColor=1a1a2e&color=16213e)](https://prototipo-gestorgasolina.vercel.app/)
+[![Aplicación Real](https://img.shields.io/badge/Aplicación_Real-1a1a2e?style=for-the-badge&logo=vercel&logoColor=white&labelColor=1a1a2e&color=16213e)](https://tu-app-real.vercel.app)
 
 ## Estructura del proyecto
 
