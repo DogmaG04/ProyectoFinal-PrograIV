@@ -2,6 +2,7 @@ import { useState, useCallback } from 'react'
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import Layout from './components/Layout'
 import Login from './components/Login'
+import LoadingScreen from './components/LoadingScreen'
 import ToastContainer from './components/Toast'
 import Dashboard from './views/Dashboard'
 import Surtidores from './views/Surtidores'
@@ -33,6 +34,7 @@ export default function App() {
 
   return (
     <ThemeProvider>
+      <LoadingScreen />
       <AdapterProvider adapter={adapter}>
         <BrowserRouter>
           <Routes>
