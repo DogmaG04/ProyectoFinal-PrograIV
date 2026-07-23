@@ -183,20 +183,17 @@ export default function Ventas() {
           )}
 
           {(campoFiltro === 'surtidor' || campoFiltro === 'combustible') && !valorFiltro ? (
-            <>
-              <div className="flex gap-1.5">
-                {(campoFiltro === 'surtidor' ? surtidoresUnicos : combustiblesUnicos).map(item => (
-                  <button
-                    key={item}
-                    onClick={() => setValorFiltro(item)}
-                    className="px-3 py-1.5 rounded-lg text-xs font-semibold bg-bg border border-border text-subtext hover:text-text hover:border-primary transition-colors"
-                  >
-                    {item}
-                  </button>
-                ))}
-              </div>
-              <span className="text-xs text-tertiary">Seleccionar valor</span>
-            </>
+            <div className="flex gap-1.5">
+              {(campoFiltro === 'surtidor' ? surtidoresUnicos : combustiblesUnicos).map(item => (
+                <button
+                  key={item}
+                  onClick={() => setValorFiltro(item)}
+                  className="px-3 py-1.5 rounded-lg text-xs font-semibold bg-bg border border-border text-subtext hover:text-text hover:border-primary transition-colors"
+                >
+                  {item}
+                </button>
+              ))}
+            </div>
           ) : (
             <>
               <input
