@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { showToast } from './Toast'
 
 interface LoginProps {
@@ -13,6 +13,11 @@ export default function Login({ onLogin }: LoginProps) {
   const [password, setPassword] = useState('')
   const [hidden, setHidden] = useState(false)
   const [logginIn, setLogginIn] = useState(false)
+
+  useEffect(() => {
+    document.documentElement.setAttribute('data-theme', 'dark')
+    localStorage.setItem('theme', 'dark')
+  }, [])
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault()

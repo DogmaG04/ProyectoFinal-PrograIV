@@ -19,6 +19,29 @@
   --color-tertiary: #5c5c6b;
 }
 
+[data-theme="light"] {
+  --color-bg: #f5f5f7;
+  --color-surface: #ffffff;
+  --color-surface-hover: #f0f0f2;
+  --color-border: #e0e0e5;
+  --color-text: #1a1a24;
+  --color-subtext: #6b6b78;
+  --color-tertiary: #9393a0;
+}
+
+[data-theme="light"] body {
+  background-color: #f5f5f7;
+  color: #1a1a24;
+}
+
+[data-theme="light"] ::-webkit-scrollbar-thumb {
+  background: #c0c0c8;
+}
+
+[data-theme="light"] ::-webkit-scrollbar-thumb:hover {
+  background: #9393a0;
+}
+
 * {
   font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
 }
