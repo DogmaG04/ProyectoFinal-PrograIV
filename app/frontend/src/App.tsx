@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useCallback } from 'react'
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import Layout from './components/Layout'
 import Login from './components/Login'
@@ -17,6 +17,8 @@ const adapter = new SupabaseAdapter()
 export default function App() {
   const [loggedIn, setLoggedIn] = useState(false)
 
+  const handleLogout = useCallback(() => setLoggedIn(false), [])
+
   if (!loggedIn) {
     return <Login onLogin={() => setLoggedIn(true)} />
   }
@@ -26,7 +28,7 @@ export default function App() {
       <AdapterProvider adapter={adapter}>
         <BrowserRouter>
           <Routes>
-            <Route element={<Layout />}>
+            <Route element={<Layout onLogout={handleLogout} />}>
               <Route path="/" element={<Dashboard />} />
               <Route path="/surtidores" element={<Surtidores />} />
               <Route path="/ventas" element={<Ventas />} />

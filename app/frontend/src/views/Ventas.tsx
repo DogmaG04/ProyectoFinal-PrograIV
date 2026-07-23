@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useMemo } from 'react'
 import { Line } from 'react-chartjs-2'
 import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend, Filler } from 'chart.js'
 import { useVentas } from '../controllers/useVentas'
@@ -13,6 +13,9 @@ import { fmt, fmtNum } from '../utils/uiHelpers'
 
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend, Filler)
 
+type CampoFiltro = 'surtidor' | 'combustible' | 'litros' | 'total'
+type OperadorFiltro = 'mayor' | 'menor' | 'igual'
+
 export default function Ventas() {
   const adapter = useAdapter()
   const { data: ventas, crear, eliminar } = useVentas(adapter)
@@ -23,7 +26,9 @@ export default function Ventas() {
   const [confirmarEliminar, setConfirmarEliminar] = useState<number | null>(null)
   const [guardando, setGuardando] = useState(false)
 
-  const [busqueda, setBusqueda] = useState('')
+  const [campoFiltro, setCampoFiltro] = useState<CampoFiltro>('surtidor')
+  const [operador, setOperador] = useState<OperadorFiltro>('mayor')
+  const [valorFiltro, setValorFiltro] = useState<string>('')
 
   const [selSurtidor, setSelSurtidor] = useState<number>(0)
   const [selCombustible, setSelCombustible] = useState<number>(0)
@@ -42,12 +47,42 @@ export default function Ventas() {
     return c ? c.color : '#6b7280'
   }
 
-  const totalVentas = ventas.reduce((a, v) => a + v.total, 0)
-  const totalLitros = ventas.reduce((a, v) => a + v.litros, 0)
-  const promedio = ventas.length ? totalVentas / ventas.length : 0
+  const filtradas = useMemo(() => {
+    if (!valorFiltro.trim()) return ventas
+    const val = valorFiltro.trim().toLowerCase()
+
+    return ventas.filter(v => {
+      switch (campoFiltro) {
+        case 'surtidor':
+          return v.surtidor.toLowerCase().includes(val)
+        case 'combustible':
+          return v.combustible.toLowerCase().includes(val)
+        case 'litros': {
+          const num = parseFloat(val)
+          if (isNaN(num)) return true
+          if (operador === 'mayor') return v.litros > num
+          if (operador === 'menor') return v.litros < num
+          return v.litros === num
+        }
+        case 'total': {
+          const num = parseFloat(val)
+          if (isNaN(num)) return true
+          if (operador === 'mayor') return v.total > num
+          if (operador === 'menor') return v.total < num
+          return v.total === num
+        }
+        default:
+          return true
+      }
+    })
+  }, [ventas, campoFiltro, operador, valorFiltro])
+
+  const totalVentas = filtradas.reduce((a, v) => a + v.total, 0)
+  const totalLitros = filtradas.reduce((a, v) => a + v.litros, 0)
+  const promedio = filtradas.length ? totalVentas / filtradas.length : 0
 
   const horas: Record<string, number> = {}
-  ventas.forEach(v => {
+  filtradas.forEach(v => {
     const h = String(new Date(v.fecha).getHours()).padStart(2, '0')
     horas[h] = (horas[h] || 0) + v.total
   })
@@ -55,15 +90,17 @@ export default function Ventas() {
   const lineLabels = sorted.map(h => h + ':00')
   const lineData = sorted.map(h => horas[h])
 
-  const filtradas = busqueda.trim()
-    ? ventas.filter(v =>
-        v.surtidor.toLowerCase().includes(busqueda.toLowerCase()) ||
-        v.combustible.toLowerCase().includes(busqueda.toLowerCase()) ||
-        v.fecha.includes(busqueda) ||
-        v.total.toString().includes(busqueda) ||
-        v.litros.toString().includes(busqueda)
-      )
-    : ventas
+  const surtidoresUnicos = [...new Set(ventas.map(v => v.surtidor))]
+  const combustiblesUnicos = [...new Set(ventas.map(v => v.combustible))]
+
+  const placeholderCampo: Record<CampoFiltro, string> = {
+    surtidor: 'Nombre del surtidor...',
+    combustible: 'Nombre del combustible...',
+    litros: 'Ej: 50',
+    total: 'Ej: 100',
+  }
+
+  const usaNumero = campoFiltro === 'litros' || campoFiltro === 'total'
 
   async function handleCrear() {
     if (!selSurtidor || !selCombustible || litrosNum <= 0) return
@@ -93,13 +130,84 @@ export default function Ventas() {
   return (
     <div>
       <div className="flex justify-between items-center mb-5">
-        <span className="text-sm text-tertiary">{ventas.length} transacciones</span>
+        <span className="text-sm text-tertiary">{filtradas.length} transacciones{valorFiltro ? ` (filtradas de ${ventas.length})` : ''}</span>
         <button
           onClick={() => setModalNueva(true)}
           className="px-4 py-2.5 bg-primary text-white rounded-xl text-sm font-semibold hover:opacity-90 transition-opacity"
         >
           + Registrar Venta
         </button>
+      </div>
+
+      <div className="bg-surface border border-border rounded-2xl p-4 mb-5">
+        <div className="flex items-center gap-3 flex-wrap">
+          <span className="text-xs font-semibold text-subtext uppercase tracking-wide">Filtrar por</span>
+
+          <div className="flex gap-1.5">
+            {(['surtidor', 'combustible', 'litros', 'total'] as CampoFiltro[]).map(c => (
+              <button
+                key={c}
+                onClick={() => { setCampoFiltro(c); setValorFiltro('') }}
+                className={`px-3 py-1.5 rounded-lg text-xs font-semibold capitalize transition-colors ${
+                  campoFiltro === c
+                    ? 'bg-primary text-white'
+                    : 'bg-bg border border-border text-subtext hover:text-text hover:border-primary'
+                }`}
+              >
+                {c}
+              </button>
+            ))}
+          </div>
+
+          {usaNumero && (
+            <div className="flex gap-1.5">
+              {(['mayor', 'menor', 'igual'] as OperadorFiltro[]).map(op => (
+                <button
+                  key={op}
+                  onClick={() => setOperador(op)}
+                  className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors ${
+                    operador === op
+                      ? 'bg-primary text-white'
+                      : 'bg-bg border border-border text-subtext hover:text-text hover:border-primary'
+                  }`}
+                >
+                  {op === 'mayor' ? '> ' : op === 'menor' ? '< ' : '= '}
+                </button>
+              ))}
+            </div>
+          )}
+
+          {(campoFiltro === 'surtidor' || campoFiltro === 'combustible') && !valorFiltro ? (
+            <div className="flex gap-1.5">
+              {(campoFiltro === 'surtidor' ? surtidoresUnicos : combustiblesUnicos).map(item => (
+                <button
+                  key={item}
+                  onClick={() => setValorFiltro(item)}
+                  className="px-3 py-1.5 rounded-lg text-xs font-semibold bg-bg border border-border text-subtext hover:text-text hover:border-primary transition-colors"
+                >
+                  {item}
+                </button>
+              ))}
+            </div>
+          ) : (
+            <input
+              type={usaNumero ? 'number' : 'text'}
+              value={valorFiltro}
+              onChange={e => setValorFiltro(e.target.value)}
+              placeholder={placeholderCampo[campoFiltro]}
+              className="px-3 py-1.5 border border-border rounded-lg bg-bg text-text text-xs outline-none w-48"
+            />
+          )}
+
+          {valorFiltro && (
+            <button
+              onClick={() => setValorFiltro('')}
+              className="px-2.5 py-1.5 rounded-lg text-xs font-semibold bg-danger/10 text-danger hover:bg-danger/20 transition-colors"
+            >
+              Limpiar
+            </button>
+          )}
+        </div>
       </div>
 
       <div className="grid grid-cols-4 gap-4 mb-5">
@@ -117,7 +225,7 @@ export default function Ventas() {
         </div>
         <div className="bg-surface border border-border rounded-2xl p-5 flex flex-col gap-2 hover:bg-surface-hover transition-colors">
           <span className="text-sm font-medium text-subtext">Transacciones</span>
-          <span className="text-text text-[28px] font-bold leading-none">{ventas.length}</span>
+          <span className="text-text text-[28px] font-bold leading-none">{filtradas.length}</span>
         </div>
       </div>
 
@@ -128,10 +236,10 @@ export default function Ventas() {
         <div className="relative h-[260px]">
           <Line
             data={{
-              labels: lineLabels,
+              labels: lineLabels.length ? lineLabels : ['Sin datos'],
               datasets: [{
                 label: 'Ventas (Bs.)',
-                data: lineData,
+                data: lineData.length ? lineData : [0],
                 borderColor: '#4d7cfe',
                 backgroundColor: 'rgba(77,124,254,0.1)',
                 fill: true,
@@ -156,18 +264,8 @@ export default function Ventas() {
       </div>
 
       <div className="bg-surface border border-border rounded-2xl overflow-hidden">
-        <div className="px-5 py-3.5 border-b border-border flex items-center justify-between">
+        <div className="px-5 py-3.5 border-b border-border">
           <span className="text-base font-bold text-text">Registro de Ventas</span>
-          <div className="flex items-center gap-3">
-            <input
-              type="text"
-              value={busqueda}
-              onChange={e => setBusqueda(e.target.value)}
-              placeholder="Buscar surtidor, combustible, fecha..."
-              className="px-3 py-1.5 border border-border rounded-lg bg-bg text-text text-xs outline-none w-64"
-            />
-            <span className="text-xs text-tertiary bg-surface-hover px-2.5 py-1 rounded-full">{filtradas.length} registros</span>
-          </div>
         </div>
         <table className="w-full border-collapse">
           <thead>

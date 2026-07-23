@@ -12,7 +12,11 @@ const titles: Record<string, string> = {
   '/reportes': 'Reportes',
 }
 
-export default function Layout() {
+interface LayoutProps {
+  onLogout?: () => void
+}
+
+export default function Layout({ onLogout }: LayoutProps) {
   const location = useLocation()
   const [time, setTime] = useState(new Date())
 
@@ -25,7 +29,7 @@ export default function Layout() {
 
   return (
     <div className="grid min-h-screen" style={{ gridTemplateColumns: '240px 1fr', gridTemplateRows: '64px 1fr', gridTemplateAreas: '"sidebar header" "sidebar main"' }}>
-      <Sidebar />
+      <Sidebar onLogout={onLogout} />
       <header className="bg-surface border-b border-border flex items-center justify-between px-8" style={{ gridArea: 'header' }}>
         <h1 className="text-text text-xl font-bold">{title}</h1>
         <div className="flex items-center gap-3 text-sm text-subtext">
