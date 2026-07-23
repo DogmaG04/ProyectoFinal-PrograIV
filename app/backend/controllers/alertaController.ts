@@ -4,14 +4,14 @@ import type { Alerta, TipoAlerta } from '../models'
 export async function obtenerAlertas(): Promise<Alerta[]> {
   const { data, error } = await supabase
     .from('alertas')
-    .select('*')
+    .select('*, surtidores!inner(codigo)')
 
   if (error || !data?.length) return []
 
   return data.map((r: any) => ({
     id: r.id,
     tipo: r.tipo,
-    surtidorId: r.surtidor_id,
+    surtidor: r.surtidores?.codigo || '',
     mensaje: r.mensaje,
     timestamp: r.timestamp,
   }))
@@ -30,7 +30,7 @@ export async function crearAlerta(
       mensaje,
       timestamp: new Date().toISOString(),
     })
-    .select()
+    .select('*, surtidores!inner(codigo)')
     .single()
 
   if (error || !data) return null
@@ -38,7 +38,7 @@ export async function crearAlerta(
   return {
     id: data.id,
     tipo: data.tipo,
-    surtidorId: data.surtidor_id,
+    surtidor: data.surtidores?.codigo || '',
     mensaje: data.mensaje,
     timestamp: data.timestamp,
   }

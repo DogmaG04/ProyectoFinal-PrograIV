@@ -1,8 +1,10 @@
 export interface Venta {
   id: number
   fecha: string
-  surtidorId: number
-  combustibleId: number
+  surtidor: string
+  combustible: string
   litros: number
   total: number
+  surtidorId: number
+  combustibleId: number
 }

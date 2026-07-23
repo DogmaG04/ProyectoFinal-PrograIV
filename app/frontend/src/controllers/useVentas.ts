@@ -10,9 +10,7 @@ export function useVentas(adapter: DatabaseAdapter | null = null) {
   const cargar = useCallback(() => {
     if (!adapter) { setLoading(false); return }
     adapter.obtenerVentas().then(rows => {
-      if (rows.length) {
-        setData(rows.map(r => new Venta(r)))
-      }
+      setData(rows.map(r => new Venta(r)))
       setLoading(false)
     }).catch(err => {
       setError(err.message)

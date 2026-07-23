@@ -66,8 +66,8 @@ export class SupabaseAdapter implements DatabaseAdapter {
       combustible: r.combustible as string,
       litros: r.litros as number,
       total: r.total as number,
-      surtidorId: r.surtidor_id as number,
-      combustibleId: r.combustible_id as number,
+      surtidorId: r.surtidorId as number,
+      combustibleId: r.combustibleId as number,
     }))
   }
 
@@ -80,12 +80,12 @@ export class SupabaseAdapter implements DatabaseAdapter {
     return {
       id: data.id as number,
       fecha: data.fecha as string,
-      surtidor: '',
-      combustible: '',
+      surtidor: data.surtidor as string,
+      combustible: data.combustible as string,
       litros: data.litros as number,
       total: data.total as number,
-      surtidorId: data.surtidor_id as number,
-      combustibleId: data.combustible_id as number,
+      surtidorId: data.surtidorId as number,
+      combustibleId: data.combustibleId as number,
     }
   }
 
@@ -114,7 +114,7 @@ export class SupabaseAdapter implements DatabaseAdapter {
     return {
       id: data.id as number,
       tipo: data.tipo as 'critica' | 'advertencia' | 'info',
-      surtidor: '',
+      surtidor: data.surtidor as string,
       mensaje: data.mensaje as string,
       timestamp: data.timestamp as string,
     }

@@ -4,17 +4,19 @@ import type { Venta } from '../models'
 export async function obtenerVentas(): Promise<Venta[]> {
   const { data, error } = await supabase
     .from('ventas')
-    .select('*')
+    .select('*, surtidores!inner(codigo), combustibles!inner(nombre)')
 
   if (error || !data?.length) return []
 
   return data.map((r: any) => ({
     id: r.id,
     fecha: r.fecha,
-    surtidorId: r.surtidor_id,
-    combustibleId: r.combustible_id,
+    surtidor: r.surtidores?.codigo || '',
+    combustible: r.combustibles?.nombre || '',
     litros: r.litros,
     total: r.total,
+    surtidorId: r.surtidor_id,
+    combustibleId: r.combustible_id,
   }))
 }
 
@@ -33,7 +35,7 @@ export async function crearVenta(
       litros,
       total,
     })
-    .select()
+    .select('*, surtidores!inner(codigo), combustibles!inner(nombre)')
     .single()
 
   if (error || !data) return null
@@ -41,10 +43,12 @@ export async function crearVenta(
   return {
     id: data.id,
     fecha: data.fecha,
-    surtidorId: data.surtidor_id,
-    combustibleId: data.combustible_id,
+    surtidor: data.surtidores?.codigo || '',
+    combustible: data.combustibles?.nombre || '',
     litros: data.litros,
     total: data.total,
+    surtidorId: data.surtidor_id,
+    combustibleId: data.combustible_id,
   }
 }
 
