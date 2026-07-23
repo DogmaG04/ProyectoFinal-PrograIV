@@ -13,6 +13,7 @@ async function api<T>(path: string, init?: RequestInit): Promise<T> {
     headers: { 'Content-Type': 'application/json' },
     ...init,
   })
+  if (!res.ok) throw new Error(`API error ${res.status}`)
   return res.json()
 }
 

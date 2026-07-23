@@ -18,14 +18,10 @@ export default function Dashboard() {
   const { data: alertas } = useAlertas(adapter)
   const { data: combustibles } = useCombustibles(adapter)
 
-  const [slideIdx, setSlideIdx] = useState(0)
   const [paginaSurt, setPaginaSurt] = useState(1)
   const [slideAlertas, setSlideAlertas] = useState(0)
   const surtPorPagina = 4
   const alertasPorSlide = 3
-  const slidesPorVista = 2
-  const totalSlides = Math.ceil(surtidores.length / slidesPorVista)
-  const parActual = surtidores.slice(slideIdx * slidesPorVista, slideIdx * slidesPorVista + slidesPorVista)
 
   const totalLitros = ventas.reduce((a, v) => a + v.litros, 0)
   const totalVentas = ventas.reduce((a, v) => a + v.total, 0)
@@ -51,56 +47,61 @@ export default function Dashboard() {
 
   return (
     <div>
-      <div className="grid grid-cols-4 gap-4 mb-6">
-        <div className="bg-surface border border-border rounded-2xl p-5 flex flex-col gap-2 hover:bg-surface-hover transition-colors">
-          <span className="text-sm font-medium text-subtext">Ventas Hoy</span>
-          <span className="text-primary text-[28px] font-bold leading-none">{fmt(totalVentas)}</span>
-          <span className="text-xs text-tertiary">{ventas.length} transacciones</span>
+      {/* KPI Cards */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4 mb-6">
+        <div className="bg-surface border border-border rounded-2xl p-3 md:p-5 flex flex-col gap-1.5 md:gap-2 hover:bg-surface-hover transition-colors">
+          <span className="text-xs md:text-sm font-medium text-subtext">Ventas Hoy</span>
+          <span className="text-primary text-lg md:text-[28px] font-bold leading-none">{fmt(totalVentas)}</span>
+          <span className="text-[10px] md:text-xs text-tertiary">{ventas.length} transacciones</span>
         </div>
-        <div className="bg-surface border border-border rounded-2xl p-5 flex flex-col gap-2 hover:bg-surface-hover transition-colors">
-          <span className="text-sm font-medium text-subtext">Litros Vendidos</span>
-          <span className="text-success text-[28px] font-bold leading-none">{fmtNum(totalLitros)} L</span>
-          <span className="text-xs text-tertiary">{combustibles.length} tipos de combustible</span>
+        <div className="bg-surface border border-border rounded-2xl p-3 md:p-5 flex flex-col gap-1.5 md:gap-2 hover:bg-surface-hover transition-colors">
+          <span className="text-xs md:text-sm font-medium text-subtext">Litros Vendidos</span>
+          <span className="text-success text-lg md:text-[28px] font-bold leading-none">{fmtNum(totalLitros)} L</span>
+          <span className="text-[10px] md:text-xs text-tertiary">{combustibles.length} tipos de combustible</span>
         </div>
-        <div className="bg-surface border border-border rounded-2xl p-5 flex flex-col gap-2 hover:bg-surface-hover transition-colors">
-          <span className="text-sm font-medium text-subtext">Surtidores Activos</span>
-          <span className="text-warning text-[28px] font-bold leading-none">{activos} / {surtidores.length}</span>
-          <span className="text-xs text-tertiary">{surtidores.length - activos} inactivos</span>
+        <div className="bg-surface border border-border rounded-2xl p-3 md:p-5 flex flex-col gap-1.5 md:gap-2 hover:bg-surface-hover transition-colors">
+          <span className="text-xs md:text-sm font-medium text-subtext">Surtidores Activos</span>
+          <span className="text-warning text-lg md:text-[28px] font-bold leading-none">{activos} / {surtidores.length}</span>
+          <span className="text-[10px] md:text-xs text-tertiary">{surtidores.length - activos} inactivos</span>
         </div>
-        <div className="bg-surface border border-border rounded-2xl p-5 flex flex-col gap-2 hover:bg-surface-hover transition-colors">
-          <span className="text-sm font-medium text-subtext">Alertas Críticas</span>
-          <span className="text-danger text-[28px] font-bold leading-none">{criticas}</span>
-          <span className="text-xs text-tertiary">{alertas.length} total</span>
+        <div className="bg-surface border border-border rounded-2xl p-3 md:p-5 flex flex-col gap-1.5 md:gap-2 hover:bg-surface-hover transition-colors">
+          <span className="text-xs md:text-sm font-medium text-subtext">Alertas Críticas</span>
+          <span className="text-danger text-lg md:text-[28px] font-bold leading-none">{criticas}</span>
+          <span className="text-[10px] md:text-xs text-tertiary">{alertas.length} total</span>
         </div>
       </div>
 
-      <div className="grid grid-cols-2 gap-4 mb-6">
+      {/* Estado Surtidores + Alertas Recientes */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-6">
+        {/* Estado de Surtidores */}
         <div className="bg-surface border border-border rounded-2xl overflow-hidden">
-          <div className="px-5 py-3.5 border-b border-border">
-            <span className="text-base font-bold text-text">Estado de Surtidores</span>
+          <div className="px-4 md:px-5 py-3 md:py-3.5 border-b border-border">
+            <span className="text-base md:text-lg font-bold text-text">Estado de Surtidores</span>
           </div>
-          <table className="w-full border-collapse">
-            <thead>
-              <tr className="bg-surface-hover">
-                <th className="text-left px-5 py-3.5 text-xs font-semibold text-subtext">Código</th>
-                <th className="text-left px-5 py-3.5 text-xs font-semibold text-subtext">Ubicación</th>
-                <th className="text-left px-5 py-3.5 text-xs font-semibold text-subtext">Estado</th>
-              </tr>
-            </thead>
-            <tbody>
-              {surtPagina.map(s => (
-                <tr key={s.id} className="border-b border-border hover:bg-surface-hover transition-colors">
-                  <td className="px-5 py-3 text-sm font-semibold text-text">{s.codigo}</td>
-                  <td className="px-5 py-3 text-sm text-subtext">{s.ubicacion}</td>
-                  <td className="px-5 py-3">
-                    <span className={`inline-flex items-center px-3 py-1 rounded-full text-[11px] font-semibold uppercase tracking-wide ${statusTagClass(s.estado)}`}>
-                      {s.estado}
-                    </span>
-                  </td>
+          <div className="overflow-x-auto">
+            <table className="w-full border-collapse min-w-[400px]">
+              <thead>
+                <tr className="bg-surface-hover">
+                  <th className="text-left px-4 md:px-5 py-3 md:py-3.5 text-xs font-semibold text-subtext">Código</th>
+                  <th className="text-left px-4 md:px-5 py-3 md:py-3.5 text-xs font-semibold text-subtext">Ubicación</th>
+                  <th className="text-left px-4 md:px-5 py-3 md:py-3.5 text-xs font-semibold text-subtext">Estado</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {surtPagina.map(s => (
+                  <tr key={s.id} className="border-b border-border hover:bg-surface-hover transition-colors">
+                    <td className="px-4 md:px-5 py-2.5 md:py-3 text-sm font-semibold text-text">{s.codigo}</td>
+                    <td className="px-4 md:px-5 py-2.5 md:py-3 text-sm text-subtext">{s.ubicacion}</td>
+                    <td className="px-4 md:px-5 py-2.5 md:py-3">
+                      <span className={`inline-flex items-center px-2.5 md:px-3 py-1 rounded-full text-[10px] md:text-[11px] font-semibold uppercase tracking-wide ${statusTagClass(s.estado)}`}>
+                        {s.estado}
+                      </span>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
           <Pagination
             paginaActual={paginaSurt}
             totalPaginas={totalPaginasSurt}
@@ -110,113 +111,36 @@ export default function Dashboard() {
           />
         </div>
 
+        {/* Alertas Recientes */}
         <div className="bg-surface border border-border rounded-2xl overflow-hidden flex flex-col">
-          <div className="px-5 py-3.5 border-b border-border flex items-center justify-between">
-            <span className="text-base font-bold text-text">Niveles de Combustible</span>
-            {totalSlides > 0 && (
-              <span className="text-xs text-tertiary bg-surface-hover px-2.5 py-1 rounded-full">
-                {slideIdx + 1} / {totalSlides}
-              </span>
-            )}
-          </div>
-          <div className="flex-1 flex items-center justify-center p-5 min-h-[240px]">
-            {parActual.length > 0 ? (
-              <div className="flex gap-8 w-full justify-center">
-                {parActual.map(s => (
-                  <div key={s.id} className="flex flex-col items-center gap-3 flex-1 min-w-0">
-                    <div className="text-center">
-                      <span className="text-sm font-bold text-text">{s.codigo}</span>
-                      <span className="block text-[10px] text-tertiary mt-0.5 truncate">{s.ubicacion}</span>
-                    </div>
-                    {s.surtidos.length > 0 ? (
-                      <div className="flex items-end justify-center gap-4">
-                        {s.surtidos.map(st => {
-                          const c = combustibles.find(x => x.id === st.combustibleId)
-                          const pct = (st.nivel / st.capacidad) * 100
-                          return (
-                            <div key={st.combustibleId} className="flex flex-col items-center gap-1.5">
-                              <span className="text-[11px] font-semibold text-text">{Math.round(pct)}%</span>
-                              <div className="w-7 h-[90px] bg-surface-hover rounded-full overflow-hidden relative">
-                                <div
-                                  className="absolute bottom-0 left-0 w-full rounded-full transition-all duration-500"
-                                  style={{ height: `${pct}%`, background: c?.color || '#6b7280' }}
-                                />
-                              </div>
-                              <span className="text-[9px] text-subtext text-center leading-tight max-w-[56px] truncate">
-                                {c?.nombre || '?'}
-                              </span>
-                            </div>
-                          )
-                        })}
-                      </div>
-                    ) : (
-                      <span className="text-[10px] text-tertiary italic">Sin datos</span>
-                    )}
-                  </div>
-                ))}
-              </div>
-            ) : (
-              <span className="text-xs text-tertiary italic">No hay surtidores</span>
-            )}
-          </div>
-          {totalSlides > 1 && (
-            <div className="px-5 pb-4 flex items-center justify-between">
-              <button
-                onClick={() => setSlideIdx(i => (i - 1 + totalSlides) % totalSlides)}
-                className="w-8 h-8 rounded-full bg-surface-hover hover:bg-primary/20 text-subtext hover:text-primary flex items-center justify-center transition-colors text-lg font-bold cursor-pointer"
-              >
-                &#8249;
-              </button>
-              <div className="flex gap-1.5">
-                {Array.from({ length: totalSlides }, (_, i) => (
-                  <button
-                    key={i}
-                    onClick={() => setSlideIdx(i)}
-                    className={`h-2 rounded-full transition-all duration-300 cursor-pointer ${i === slideIdx ? 'bg-primary w-5' : 'bg-surface-hover hover:bg-subtext w-2'}`}
-                  />
-                ))}
-              </div>
-              <button
-                onClick={() => setSlideIdx(i => (i + 1) % totalSlides)}
-                className="w-8 h-8 rounded-full bg-surface-hover hover:bg-primary/20 text-subtext hover:text-primary flex items-center justify-center transition-colors text-lg font-bold cursor-pointer"
-              >
-                &#8250;
-              </button>
-            </div>
-          )}
-        </div>
-      </div>
-
-      <div className="mb-6">
-        <div className="bg-surface border border-border rounded-2xl overflow-hidden">
-          <div className="px-5 py-3.5 border-b border-border flex items-center justify-between">
-            <span className="text-base font-bold text-text">Alertas Recientes</span>
+          <div className="px-4 md:px-5 py-3 md:py-3.5 border-b border-border flex items-center justify-between">
+            <span className="text-base md:text-lg font-bold text-text">Alertas Recientes</span>
             {totalSlidesAlertas > 0 && (
-              <span className="text-xs text-tertiary bg-surface-hover px-2.5 py-1 rounded-full">
+              <span className="text-[10px] md:text-xs text-tertiary bg-surface-hover px-2 md:px-2.5 py-1 rounded-full">
                 {slideAlertas + 1} / {totalSlidesAlertas}
               </span>
             )}
           </div>
-          <div className="p-3 flex flex-col gap-2.5 min-h-[120px]">
+          <div className="p-3 flex flex-col gap-2.5 min-h-[120px] overflow-hidden">
             {alertasSlide.length > 0 ? alertasSlide.map(a => (
-              <div key={a.id} className={`bg-surface border border-border border-l-4 ${a.tipo === 'critica' ? 'border-l-danger' : a.tipo === 'advertencia' ? 'border-l-warning' : 'border-l-primary'} rounded-2xl p-4 flex items-start justify-between gap-4 hover:bg-surface-hover transition-colors`}>
-                <div className="flex flex-col gap-1.5 flex-1">
-                  <span className="text-sm font-medium text-text">{a.mensaje}</span>
-                  <div className="flex gap-3 text-xs text-tertiary">
-                    <span>{a.surtidor}</span>
-                    <span>{a.timestamp}</span>
+              <div key={a.id} className={`bg-surface border border-border border-l-4 ${a.tipo === 'critica' ? 'border-l-danger' : a.tipo === 'advertencia' ? 'border-l-warning' : 'border-l-primary'} rounded-2xl p-3 md:p-4 flex items-start justify-between gap-3 md:gap-4 hover:bg-surface-hover transition-colors`}>
+                <div className="flex flex-col gap-1.5 flex-1 min-w-0">
+                  <span className="text-xs md:text-sm font-medium text-text">{a.mensaje}</span>
+                  <div className="flex gap-2 md:gap-3 text-[10px] md:text-xs text-tertiary">
+                    <span className="truncate">{a.surtidor}</span>
+                    <span className="whitespace-nowrap">{a.timestamp}</span>
                   </div>
                 </div>
-                <span className={`text-[11px] font-bold uppercase tracking-wide whitespace-nowrap px-3 py-1 rounded-full ${a.tipo === 'critica' ? 'text-danger bg-danger-light' : a.tipo === 'advertencia' ? 'text-warning bg-warning-light' : 'text-primary bg-primary-light'}`}>
+                <span className={`text-[10px] md:text-[11px] font-bold uppercase tracking-wide whitespace-nowrap px-2.5 md:px-3 py-1 rounded-full ${a.tipo === 'critica' ? 'text-danger bg-danger-light' : a.tipo === 'advertencia' ? 'text-warning bg-warning-light' : 'text-primary bg-primary-light'}`}>
                   {a.tipo}
                 </span>
               </div>
             )) : (
-              <span className="text-xs text-tertiary italic text-center py-4">No hay alertas</span>
+              <span className="text-[10px] md:text-xs text-tertiary italic text-center py-4">No hay alertas</span>
             )}
           </div>
           {totalSlidesAlertas > 1 && (
-            <div className="px-5 pb-4 flex items-center justify-between">
+            <div className="px-4 md:px-5 pb-4 flex items-center justify-between">
               <button
                 onClick={() => setSlideAlertas(i => (i - 1 + totalSlidesAlertas) % totalSlidesAlertas)}
                 className="w-8 h-8 rounded-full bg-surface-hover hover:bg-primary/20 text-subtext hover:text-primary flex items-center justify-center transition-colors text-lg font-bold cursor-pointer"
@@ -243,12 +167,13 @@ export default function Dashboard() {
         </div>
       </div>
 
-      <div className="grid grid-cols-2 gap-4">
-        <div className="bg-surface border border-border rounded-2xl p-5">
+      {/* Charts */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+        <div className="bg-surface border border-border rounded-2xl p-4 md:p-5">
           <div className="mb-3">
-            <span className="text-base font-bold text-text">Ventas por Combustible</span>
+            <span className="text-base md:text-lg font-bold text-text">Ventas por Combustible</span>
           </div>
-          <div className="relative h-[260px]">
+          <div className="relative min-h-[220px] md:min-h-[260px]">
             <Bar
               data={{
                 labels: porComb.map(c => c.nombre),
@@ -274,11 +199,11 @@ export default function Dashboard() {
             />
           </div>
         </div>
-        <div className="bg-surface border border-border rounded-2xl p-5">
+        <div className="bg-surface border border-border rounded-2xl p-4 md:p-5">
           <div className="mb-3">
-            <span className="text-base font-bold text-text">Surtidores por Estado</span>
+            <span className="text-base md:text-lg font-bold text-text">Surtidores por Estado</span>
           </div>
-          <div className="relative h-[260px]">
+          <div className="relative min-h-[220px] md:min-h-[260px]">
             <Doughnut
               data={{
                 labels: estadoLabels.map(e => e.charAt(0).toUpperCase() + e.slice(1)),

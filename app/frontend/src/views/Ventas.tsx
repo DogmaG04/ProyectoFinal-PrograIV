@@ -169,11 +169,11 @@ export default function Ventas() {
         <div className="flex items-center gap-3 flex-wrap">
           <span className="text-xs font-semibold text-subtext uppercase tracking-wide">Filtrar por</span>
 
-          <div className="flex gap-1.5">
+          <div className="flex gap-1.5 flex-wrap">
             {(['surtidor', 'combustible', 'litros', 'total'] as CampoFiltro[]).map(c => (
               <button
                 key={c}
-                onClick={() => { setCampoFiltro(c); setValorFiltro('') }}
+                onClick={() => { setCampoFiltro(c); setValorFiltro(''); setPaginaVenta(1) }}
                 className={`px-3 py-1.5 rounded-lg text-xs font-semibold capitalize transition-colors ${
                   campoFiltro === c
                     ? 'bg-primary text-white'
@@ -189,11 +189,11 @@ export default function Ventas() {
 
           {usaNumero && (
             <>
-              <div className="flex gap-1.5">
+              <div className="flex gap-1.5 flex-wrap">
                 {(['mayor', 'menor', 'igual'] as OperadorFiltro[]).map(op => (
                   <button
                     key={op}
-                    onClick={() => setOperador(op)}
+                    onClick={() => { setOperador(op); setPaginaVenta(1) }}
                     className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors ${
                       operador === op
                         ? 'bg-primary text-white'
@@ -209,11 +209,11 @@ export default function Ventas() {
           )}
 
           {(campoFiltro === 'surtidor' || campoFiltro === 'combustible') && !valorFiltro ? (
-            <div className="flex gap-1.5">
+            <div className="flex gap-1.5 flex-wrap">
               {(campoFiltro === 'surtidor' ? surtidoresUnicos : combustiblesUnicos).map(item => (
                 <button
                   key={item}
-                  onClick={() => setValorFiltro(item)}
+                  onClick={() => { setValorFiltro(item); setPaginaVenta(1) }}
                   className="px-3 py-1.5 rounded-lg text-xs font-semibold bg-bg border border-border text-subtext hover:text-text hover:border-primary transition-colors"
                 >
                   {item}
@@ -225,7 +225,7 @@ export default function Ventas() {
               <input
                 type={usaNumero ? 'number' : 'text'}
                 value={valorFiltro}
-                onChange={e => setValorFiltro(e.target.value)}
+                onChange={e => { setValorFiltro(e.target.value); setPaginaVenta(1) }}
                 placeholder={placeholderCampo[campoFiltro]}
                 className="px-3 py-1.5 border border-border rounded-lg bg-bg text-text text-xs outline-none w-48"
               />
@@ -235,7 +235,7 @@ export default function Ventas() {
 
           {valorFiltro && (
             <button
-              onClick={() => setValorFiltro('')}
+              onClick={() => { setValorFiltro(''); setPaginaVenta(1) }}
               className="px-2.5 py-1.5 rounded-lg text-xs font-semibold bg-danger/10 text-danger hover:bg-danger/20 transition-colors"
             >
               Limpiar
@@ -244,28 +244,28 @@ export default function Ventas() {
         </div>
       </div>
 
-      <div className="grid grid-cols-4 gap-4 mb-5">
-        <div className="bg-surface border border-border rounded-2xl p-5 flex flex-col gap-2 hover:bg-surface-hover transition-colors">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-5">
+        <div className="bg-surface border border-border rounded-2xl p-4 md:p-5 flex flex-col gap-2 hover:bg-surface-hover transition-colors">
           <span className="text-sm font-medium text-subtext">Total Ventas</span>
-          <span className="text-primary text-[28px] font-bold leading-none">{fmt(totalVentas)}</span>
+          <span className="text-primary text-xl md:text-[28px] font-bold leading-none">{fmt(totalVentas)}</span>
         </div>
-        <div className="bg-surface border border-border rounded-2xl p-5 flex flex-col gap-2 hover:bg-surface-hover transition-colors">
+        <div className="bg-surface border border-border rounded-2xl p-4 md:p-5 flex flex-col gap-2 hover:bg-surface-hover transition-colors">
           <span className="text-sm font-medium text-subtext">Total Litros</span>
-          <span className="text-success text-[28px] font-bold leading-none">{fmtNum(totalLitros)} L</span>
+          <span className="text-success text-xl md:text-[28px] font-bold leading-none">{fmtNum(totalLitros)} L</span>
         </div>
-        <div className="bg-surface border border-border rounded-2xl p-5 flex flex-col gap-2 hover:bg-surface-hover transition-colors">
+        <div className="bg-surface border border-border rounded-2xl p-4 md:p-5 flex flex-col gap-2 hover:bg-surface-hover transition-colors">
           <span className="text-sm font-medium text-subtext">Ticket Promedio</span>
-          <span className="text-warning text-[28px] font-bold leading-none">{fmt(promedio)}</span>
+          <span className="text-warning text-xl md:text-[28px] font-bold leading-none">{fmt(promedio)}</span>
         </div>
-        <div className="bg-surface border border-border rounded-2xl p-5 flex flex-col gap-2 hover:bg-surface-hover transition-colors">
+        <div className="bg-surface border border-border rounded-2xl p-4 md:p-5 flex flex-col gap-2 hover:bg-surface-hover transition-colors">
           <span className="text-sm font-medium text-subtext">Transacciones</span>
-          <span className="text-text text-[28px] font-bold leading-none">{filtradas.length}</span>
+          <span className="text-text text-xl md:text-[28px] font-bold leading-none">{filtradas.length}</span>
         </div>
       </div>
 
       <div className="bg-surface border border-border rounded-2xl p-5 mb-5">
         <div className="mb-3">
-          <span className="text-base font-bold text-text">Ventas por Hora</span>
+          <span className="text-base md:text-lg font-bold text-text">Ventas por Hora</span>
         </div>
         <div className="relative h-[260px]">
           <Line
@@ -299,8 +299,9 @@ export default function Ventas() {
 
       <div className="bg-surface border border-border rounded-2xl overflow-hidden">
         <div className="px-5 py-3.5 border-b border-border">
-          <span className="text-base font-bold text-text">Registro de Ventas</span>
+          <span className="text-base md:text-lg font-bold text-text">Registro de Ventas</span>
         </div>
+        <div className="overflow-x-auto">
         <table className="w-full border-collapse">
           <thead>
             <tr className="bg-surface-hover">
@@ -344,6 +345,7 @@ export default function Ventas() {
             </tr>
           </tfoot>
         </table>
+        </div>
         <Pagination
           paginaActual={paginaVenta}
           totalPaginas={totalPaginasVentas}
@@ -354,7 +356,7 @@ export default function Ventas() {
       </div>
 
       <Modal abierto={modalNueva} titulo="Registrar Venta" onClose={() => { setModalNueva(false); setErrores({}); setTouch({}) }}>
-        <div className="flex flex-col gap-4">
+        <div className="flex flex-col gap-4 p-4 sm:p-6">
           <div className="flex flex-col gap-1.5">
             <label className="text-xs font-semibold text-subtext">Surtidor</label>
             <select

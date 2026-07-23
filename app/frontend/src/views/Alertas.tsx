@@ -125,12 +125,12 @@ export default function Alertas() {
 
   return (
     <div>
-      <div className="flex justify-between items-center mb-5">
-        <div className="flex gap-2">
+      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 mb-5">
+        <div className="flex flex-wrap gap-1.5 sm:gap-2">
           {tipos.map(t => (
             <button
               key={t}
-              onClick={() => setFilter(t)}
+              onClick={() => { setFilter(t); setPaginaAlerta(1) }}
               className={`px-4 py-2 rounded-full text-xs font-medium transition-all ${
                 filter === t
                   ? 'bg-primary text-white border-primary'
@@ -176,7 +176,7 @@ export default function Alertas() {
                   {lista.map(a => (
                     <div
                       key={a.id}
-                      className={`bg-bg border border-border border-l-4 ${cfg.borde} rounded-xl p-4 flex items-start justify-between gap-4 hover:bg-surface-hover transition-colors`}
+                      className={`bg-bg border border-border border-l-4 ${cfg.borde} rounded-xl p-3 md:p-4 flex items-start justify-between gap-3 md:gap-4 hover:bg-surface-hover transition-colors`}
                     >
                       <div className="flex flex-col gap-1.5 flex-1">
                         <span className="text-sm font-medium text-text">{a.mensaje}</span>
@@ -216,7 +216,7 @@ export default function Alertas() {
       />
 
       <Modal abierto={modalNueva} titulo="Nueva Alerta" onClose={() => { setModalNueva(false); setErrores({}); setTouch({}) }}>
-        <div className="flex flex-col gap-4">
+        <div className="flex flex-col gap-4 p-4 sm:p-6">
           <div className="flex flex-col gap-1.5">
             <label className="text-xs font-semibold text-subtext">Tipo</label>
             <select

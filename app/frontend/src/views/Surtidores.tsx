@@ -7,7 +7,7 @@ import Modal from '../components/Modal'
 import ConfirmDialog from '../components/ConfirmDialog'
 import { showToast } from '../components/Toast'
 import { fmtNum, statusTagClass, getNivelClass, getNivelColor } from '../utils/uiHelpers'
-import { surtidorSchema, editarSurtidorSchema } from '../schemas'
+import { surtidorSchema } from '../schemas'
 import Pagination from '../components/Pagination'
 
 export default function Surtidores() {
@@ -61,6 +61,7 @@ export default function Surtidores() {
     if (ok) {
       showToast('exito', `Surtidor ${codigo} creado (${tipo})`)
       setModalCrear(false)
+      setTipo('estacionario')
       setCodigo('')
       setUbicacion('')
       setErrores({})
@@ -100,7 +101,7 @@ export default function Surtidores() {
 
   return (
     <div>
-      <div className="flex justify-between items-center mb-5">
+      <div className="flex flex-wrap justify-between items-center gap-2 mb-5">
         <span className="text-sm text-tertiary">{surtidores.length} surtidores registrados</span>
         <button
           onClick={() => setModalCrear(true)}
@@ -111,7 +112,7 @@ export default function Surtidores() {
       </div>
 
       <div className="bg-surface border border-border rounded-2xl overflow-hidden">
-      <div className="grid grid-cols-2 gap-4 p-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-4 p-3 md:p-4">
         {surtPagina.map(s => {
           const gauges = s.surtidos.map(st => {
             const c = combustibles.find(x => x.id === st.combustibleId)
@@ -132,15 +133,15 @@ export default function Surtidores() {
           })
 
           return (
-            <div key={s.id} className="bg-surface border border-border rounded-2xl p-5 hover:bg-surface-hover transition-colors">
-              <div className="flex items-center justify-between pb-3.5 mb-4 border-b border-border">
-                <span className="text-lg font-bold text-text">{s.codigo}</span>
+            <div key={s.id} className="bg-surface border border-border rounded-2xl p-3 md:p-4 hover:bg-surface-hover transition-colors">
+              <div className="flex flex-wrap items-center justify-between gap-2 pb-3.5 mb-4 border-b border-border">
+                <span className="text-base md:text-lg font-bold text-text">{s.codigo}</span>
                 <span className="text-xs text-tertiary">{s.ubicacion}</span>
                 <span className={`inline-flex items-center px-3 py-1 rounded-full text-[11px] font-semibold uppercase tracking-wide ${statusTagClass(s.estado)}`}>
                   {s.estado}
                 </span>
               </div>
-              <div className="grid grid-cols-3 gap-4 mb-4">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 md:gap-4 mb-4">
                 {gauges}
               </div>
               <div className="flex gap-2 pt-3 border-t border-border">
@@ -171,7 +172,7 @@ export default function Surtidores() {
       </div>
 
       <Modal abierto={modalCrear} titulo="Nuevo Surtidor" onClose={() => { setModalCrear(false); setErrores({}); setTouch({}) }}>
-        <div className="flex flex-col gap-4">
+        <div className="flex flex-col gap-4 p-4 sm:p-6">
           <div className="flex flex-col gap-1.5">
             <label className="text-xs font-semibold text-subtext">Tipo de Surtidor</label>
             <select
@@ -235,7 +236,7 @@ export default function Surtidores() {
       </Modal>
 
       <Modal abierto={modalEditar !== null} titulo="Editar Surtidor" onClose={() => { setModalEditar(null); setErrores({}); setTouch({}) }}>
-        <div className="flex flex-col gap-4">
+        <div className="flex flex-col gap-4 p-4 sm:p-6">
           <div className="flex flex-col gap-1.5">
             <label className="text-xs font-semibold text-subtext">Estado</label>
             <select

@@ -11,7 +11,7 @@ export function useCombustibles(adapter: DatabaseAdapter | null = null) {
     adapter.obtenerCombustibles().then(rows => {
       setData(rows.map(r => ({ id: r.id, nombre: r.nombre, color: r.color, precioLitro: r.precioLitro })))
       setLoading(false)
-    })
+    }).catch(() => setLoading(false))
   }, [adapter])
 
   return { data, loading }
