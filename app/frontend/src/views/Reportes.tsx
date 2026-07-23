@@ -1,103 +1,160 @@
-import { mockVentas } from '../services/mockData'
+import { Bar } from 'react-chartjs-2'
+import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend } from 'chart.js'
+import { COMBUSTIBLES, mockVentas, mockSurtidores } from '../services/mockData'
+
+ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend)
+
+const fmt = (n: number) => 'Bs. ' + n.toLocaleString('es-BO', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
+const fmtNum = (n: number) => n.toLocaleString('es-BO', { minimumFractionDigits: 1, maximumFractionDigits: 1 })
+
+function statusTagClass(estado: string) {
+  const map: Record<string, string> = { activo: 'text-success bg-success-light', mantenimiento: 'text-warning bg-warning-light', 'fuera de servicio': 'text-danger bg-danger-light' }
+  return map[estado] || ''
+}
 
 export default function Reportes() {
-  const ventasPorCombustible = mockVentas.reduce((acc, v) => {
-    if (!acc[v.combustible]) acc[v.combustible] = { litros: 0, total: 0, count: 0 }
-    acc[v.combustible].litros += v.litros
-    acc[v.combustible].total += v.total
-    acc[v.combustible].count += 1
-    return acc
-  }, {})
+  const porComb = COMBUSTIBLES.map(c => {
+    const ventasC = mockVentas.filter(v => v.combustibleId === c.id)
+    return {
+      ...c,
+      litros: ventasC.reduce((a, v) => a + v.litros, 0),
+      total: ventasC.reduce((a, v) => a + v.total, 0),
+      transacciones: ventasC.length,
+    }
+  })
 
-  const ventasPorSurtidor = mockVentas.reduce((acc, v) => {
-    if (!acc[v.surtidor_id]) acc[v.surtidor_id] = { litros: 0, total: 0, count: 0 }
-    acc[v.surtidor_id].litros += v.litros
-    acc[v.surtidor_id].total += v.total
-    acc[v.surtidor_id].count += 1
-    return acc
-  }, {})
-
-  const grandTotal = mockVentas.reduce((acc, v) => acc + v.total, 0)
-  const grandLitros = mockVentas.reduce((acc, v) => acc + v.litros, 0)
+  const porSurt = mockSurtidores.filter(s => s.estado !== 'fuera de servicio').map(s => {
+    const ventasS = mockVentas.filter(v => v.surtidorId === s.id)
+    const porCombS = COMBUSTIBLES.map(c => {
+      const v = ventasS.filter(x => x.combustibleId === c.id)
+      return {
+        nombre: c.nombre,
+        color: c.color,
+        litros: v.reduce((a, x) => a + x.litros, 0),
+        total: v.reduce((a, x) => a + x.total, 0),
+      }
+    })
+    return {
+      ...s,
+      litros: ventasS.reduce((a, v) => a + v.litros, 0),
+      total: ventasS.reduce((a, v) => a + v.total, 0),
+      transacciones: ventasS.length,
+      porComb: porCombS,
+    }
+  })
 
   return (
     <div>
-      <h1 className="text-text text-lg font-semibold mb-6 uppercase tracking-wider">Reportes</h1>
+      <div className="mb-4">
+        <span className="text-base font-bold text-text">Resumen por Combustible</span>
+      </div>
+      <div className="grid grid-cols-3 gap-4 mb-6">
+        {porComb.map(c => (
+          <div key={c.id} className="bg-surface border border-border rounded-2xl p-5">
+            <div className="flex items-center gap-2.5 pb-3 mb-4 border-b border-border">
+              <span className="w-2.5 h-2.5 rounded-full" style={{ background: c.color }} />
+              <span className="text-sm font-bold" style={{ color: c.color }}>{c.nombre}</span>
+            </div>
+            <div className="space-y-2">
+              <div className="flex justify-between text-sm"><span className="text-subtext">Precio / litro</span><span className="text-text font-semibold">{fmt(c.precioLitro)}</span></div>
+              <div className="flex justify-between text-sm"><span className="text-subtext">Litros vendidos</span><span className="text-text font-semibold">{fmtNum(c.litros)} L</span></div>
+              <div className="flex justify-between text-sm"><span className="text-subtext">Total en ventas</span><span className="text-text font-semibold">{fmt(c.total)}</span></div>
+              <div className="flex justify-between text-sm"><span className="text-subtext">Transacciones</span><span className="text-text font-semibold">{c.transacciones}</span></div>
+            </div>
+          </div>
+        ))}
+      </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-        <div className="bg-panel border border-border p-5">
-          <p className="text-subtext text-[10px] uppercase tracking-widest mb-1">Litros Vendidos</p>
-          <p className="text-cyan text-2xl font-bold">{grandLitros.toFixed(1)}L</p>
+      <div className="bg-surface border border-border rounded-2xl p-5 mb-6">
+        <div className="mb-3">
+          <span className="text-base font-bold text-text">Litros Vendidos por Combustible</span>
         </div>
-        <div className="bg-panel border border-border p-5">
-          <p className="text-subtext text-[10px] uppercase tracking-widest mb-1">Ingresos Totales</p>
-          <p className="text-mint text-2xl font-bold">${grandTotal.toFixed(2)}</p>
+        <div className="relative h-[260px]">
+          <Bar
+            data={{
+              labels: porComb.map(c => c.nombre),
+              datasets: [{
+                label: 'Litros',
+                data: porComb.map(c => c.litros),
+                backgroundColor: porComb.map(c => c.color + '99'),
+                borderColor: porComb.map(c => c.color),
+                borderWidth: 1.5,
+                borderRadius: 6,
+                barPercentage: 0.5,
+              }],
+            }}
+            options={{
+              responsive: true,
+              maintainAspectRatio: false,
+              indexAxis: 'y',
+              plugins: { legend: { display: false } },
+              scales: {
+                x: { beginAtZero: true, grid: { color: '#2a2a3644' }, ticks: { color: '#9393a0' } },
+                y: { grid: { display: false }, ticks: { color: '#9393a0' } },
+              },
+            }}
+          />
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <div className="bg-panel border border-border">
-          <div className="px-5 py-3 border-b border-border">
-            <h2 className="text-subtext text-xs uppercase tracking-widest">Por Combustible</h2>
-          </div>
-          <table className="w-full text-left">
-            <thead>
-              <tr className="border-b border-cyan/30">
-                <th className="px-4 py-3 text-[10px] font-semibold text-subtext uppercase tracking-widest">Tipo</th>
-                <th className="px-4 py-3 text-[10px] font-semibold text-subtext uppercase tracking-widest">Ventas</th>
-                <th className="px-4 py-3 text-[10px] font-semibold text-subtext uppercase tracking-widest">Litros</th>
-                <th className="px-4 py-3 text-[10px] font-semibold text-subtext uppercase tracking-widest">Total</th>
-              </tr>
-            </thead>
-            <tbody>
-              {Object.entries(ventasPorCombustible).map(([tipo, data]) => (
-                <tr key={tipo} className="border-b border-border hover:bg-panel-hover transition-colors">
-                  <td className="px-4 py-3 text-xs text-text font-semibold">{tipo}</td>
-                  <td className="px-4 py-3 text-xs text-subtext">{data.count}</td>
-                  <td className="px-4 py-3 text-xs text-text">{data.litros.toFixed(1)}L</td>
-                  <td className="px-4 py-3 text-xs text-mint font-semibold">${data.total.toFixed(2)}</td>
-                </tr>
+      <div className="mb-4">
+        <span className="text-base font-bold text-text">Resumen por Surtidor</span>
+      </div>
+      <div className="grid grid-cols-2 gap-4 mb-6">
+        {porSurt.map(s => (
+          <div key={s.id} className="bg-surface border border-border rounded-2xl p-5">
+            <div className="flex items-center justify-between mb-3">
+              <span className="text-sm font-bold text-subtext uppercase tracking-wide">{s.codigo} — {s.ubicacion}</span>
+              <span className={`inline-flex items-center px-3 py-1 rounded-full text-[11px] font-semibold uppercase tracking-wide ${statusTagClass(s.estado)}`}>
+                {s.estado}
+              </span>
+            </div>
+            <div className="space-y-2">
+              <div className="flex justify-between text-sm"><span className="text-subtext">Ventas totales</span><span className="text-text font-semibold">{fmt(s.total)}</span></div>
+              <div className="flex justify-between text-sm"><span className="text-subtext">Litros totales</span><span className="text-text font-semibold">{fmtNum(s.litros)} L</span></div>
+              <div className="flex justify-between text-sm"><span className="text-subtext">Transacciones</span><span className="text-text font-semibold">{s.transacciones}</span></div>
+            </div>
+            <div className="border-t border-border my-2.5" />
+            <div className="space-y-2">
+              {s.porComb.map(c => (
+                <div key={c.nombre} className="flex justify-between text-sm">
+                  <span className="font-medium" style={{ color: c.color }}>{c.nombre}</span>
+                  <span className="text-text font-semibold">{fmtNum(c.litros)} L — {fmt(c.total)}</span>
+                </div>
               ))}
-              <tr className="border-t border-cyan/30">
-                <td className="px-4 py-3 text-xs text-cyan font-bold">TOTAL</td>
-                <td className="px-4 py-3 text-xs text-cyan font-bold">{mockVentas.length}</td>
-                <td className="px-4 py-3 text-xs text-cyan font-bold">{grandLitros.toFixed(1)}L</td>
-                <td className="px-4 py-3 text-xs text-cyan font-bold">${grandTotal.toFixed(2)}</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
+            </div>
+          </div>
+        ))}
+      </div>
 
-        <div className="bg-panel border border-border">
-          <div className="px-5 py-3 border-b border-border">
-            <h2 className="text-subtext text-xs uppercase tracking-widest">Por Surtidor</h2>
-          </div>
-          <table className="w-full text-left">
-            <thead>
-              <tr className="border-b border-cyan/30">
-                <th className="px-4 py-3 text-[10px] font-semibold text-subtext uppercase tracking-widest">N°</th>
-                <th className="px-4 py-3 text-[10px] font-semibold text-subtext uppercase tracking-widest">Ventas</th>
-                <th className="px-4 py-3 text-[10px] font-semibold text-subtext uppercase tracking-widest">Litros</th>
-                <th className="px-4 py-3 text-[10px] font-semibold text-subtext uppercase tracking-widest">Total</th>
-              </tr>
-            </thead>
-            <tbody>
-              {Object.entries(ventasPorSurtidor).map(([id, data]) => (
-                <tr key={id} className="border-b border-border hover:bg-panel-hover transition-colors">
-                  <td className="px-4 py-3 text-xs text-cyan font-semibold">N° {id}</td>
-                  <td className="px-4 py-3 text-xs text-subtext">{data.count}</td>
-                  <td className="px-4 py-3 text-xs text-text">{data.litros.toFixed(1)}L</td>
-                  <td className="px-4 py-3 text-xs text-mint font-semibold">${data.total.toFixed(2)}</td>
-                </tr>
-              ))}
-              <tr className="border-t border-cyan/30">
-                <td className="px-4 py-3 text-xs text-cyan font-bold">TOTAL</td>
-                <td className="px-4 py-3 text-xs text-cyan font-bold">{mockVentas.length}</td>
-                <td className="px-4 py-3 text-xs text-cyan font-bold">{grandLitros.toFixed(1)}L</td>
-                <td className="px-4 py-3 text-xs text-cyan font-bold">${grandTotal.toFixed(2)}</td>
-              </tr>
-            </tbody>
-          </table>
+      <div className="bg-surface border border-border rounded-2xl p-5">
+        <div className="mb-3">
+          <span className="text-base font-bold text-text">Ventas por Surtidor</span>
+        </div>
+        <div className="relative h-[260px]">
+          <Bar
+            data={{
+              labels: porSurt.map(s => s.codigo),
+              datasets: [{
+                label: 'Ventas (Bs.)',
+                data: porSurt.map(s => s.total),
+                backgroundColor: '#4d7cfe99',
+                borderColor: '#4d7cfe',
+                borderWidth: 1.5,
+                borderRadius: 6,
+                barPercentage: 0.6,
+              }],
+            }}
+            options={{
+              responsive: true,
+              maintainAspectRatio: false,
+              plugins: { legend: { display: false } },
+              scales: {
+                y: { beginAtZero: true, grid: { color: '#2a2a3644' }, ticks: { color: '#9393a0' } },
+                x: { grid: { display: false }, ticks: { color: '#9393a0' } },
+              },
+            }}
+          />
         </div>
       </div>
     </div>

@@ -1,49 +1,60 @@
-import { mockSurtidores } from '../services/mockData'
+import { mockSurtidores, COMBUSTIBLES } from '../services/mockData'
+
+function statusTagClass(estado: string) {
+  const map: Record<string, string> = { activo: 'text-success bg-success-light', mantenimiento: 'text-warning bg-warning-light', 'fuera de servicio': 'text-danger bg-danger-light' }
+  return map[estado] || ''
+}
+
+function getNivelClass(nivel: number) {
+  return nivel <= 20 ? 'animate-pulse' : ''
+}
+
+function getNivelColor(nivel: number) {
+  if (nivel <= 20) return '#f87171'
+  if (nivel <= 40) return '#fbbf24'
+  return '#4d7cfe'
+}
+
+const fmtNum = (n: number) => n.toLocaleString('es-BO', { minimumFractionDigits: 1, maximumFractionDigits: 1 })
 
 export default function Surtidores() {
   return (
     <div>
-      <h1 className="text-text text-lg font-semibold mb-6 uppercase tracking-wider">Gestión de Surtidores</h1>
-
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {mockSurtidores.map(s => (
-          <div key={s.id} className="bg-panel border border-border p-5 hover:bg-panel-hover transition-colors">
-            <div className="flex justify-between items-start mb-4">
-              <div>
-                <h3 className="text-cyan text-lg font-bold">N° {s.numero}</h3>
-                <p className="text-subtext text-[10px] uppercase tracking-wider mt-1">{s.combustible}</p>
+      <div className="grid grid-cols-2 gap-4">
+        {mockSurtidores.map(s => {
+          const gauges = s.surtidos.map(st => {
+            const c = COMBUSTIBLES.find(x => x.id === st.combustibleId)
+            if (!c) return null
+            const pct = (st.nivel / st.capacidad) * 100
+            const litrosAct = (pct * st.capacidad) / 100
+            return (
+              <div key={c.id} className="flex flex-col gap-2">
+                <div className="flex flex-col gap-0.5">
+                  <span className="text-sm font-bold" style={{ color: c.color }}>{c.nombre}</span>
+                  <span className="text-xs text-tertiary font-medium">{Math.round(pct)}% — {fmtNum(litrosAct)} L</span>
+                </div>
+                <div className="w-full h-2.5 bg-surface-hover rounded-full overflow-hidden">
+                  <div className={`h-full rounded-full ${getNivelClass(pct)}`} style={{ width: `${pct}%`, background: getNivelColor(pct) }} />
+                </div>
               </div>
-              <span className={`text-[10px] font-semibold px-2 py-1 ${
-                s.estadoNivel === 'critico' ? 'text-red border border-red/30' :
-                s.estadoNivel === 'bajo' ? 'text-amber border border-amber/30' :
-                'text-mint border border-mint/30'
-              }`}>
-                {s.estadoNivel === 'critico' ? 'CRÍTICO' :
-                 s.estadoNivel === 'bajo' ? 'BAJO' : 'NORMAL'}
-              </span>
-            </div>
+            )
+          })
 
-            <div className="mb-3">
-              <div className="w-full bg-border h-2 rounded-full overflow-hidden">
-                <div
-                  className={`h-full rounded-full ${
-                    s.estadoNivel === 'critico' ? 'bg-red' :
-                    s.estadoNivel === 'bajo' ? 'bg-amber' : 'bg-mint'
-                  }`}
-                  style={{ width: `${s.porcentajeNivel}%` }}
-                />
+          return (
+            <div key={s.id} className="bg-surface border border-border rounded-2xl p-5 hover:bg-surface-hover transition-colors">
+              <div className="flex items-center justify-between pb-3.5 mb-4 border-b border-border">
+                <span className="text-lg font-bold text-text">{s.codigo}</span>
+                <span className="text-xs text-tertiary">{s.ubicacion}</span>
+                <span className={`inline-flex items-center px-3 py-1 rounded-full text-[11px] font-semibold uppercase tracking-wide ${statusTagClass(s.estado)}`}>
+                  {s.estado}
+                </span>
+              </div>
+              <div className="grid grid-cols-3 gap-4">
+                {gauges}
               </div>
             </div>
-
-            <div className="flex justify-between text-[10px] text-subtext">
-              <span>{s.nivel}L / {s.capacidad}L</span>
-              <span className={`font-semibold ${
-                s.estadoNivel === 'critico' ? 'text-red' :
-                s.estadoNivel === 'bajo' ? 'text-amber' : 'text-mint'
-              }`}>{s.porcentajeNivel}%</span>
-            </div>
-          </div>
-        ))}
+          )
+        })}
       </div>
     </div>
   )
