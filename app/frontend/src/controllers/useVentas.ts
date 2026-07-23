@@ -1,10 +1,9 @@
 import { useState, useEffect, useCallback } from 'react'
 import { Venta } from '../models/Venta'
-import { mockVentas } from '../services/mockData'
 import { DatabaseAdapter } from '../patterns/adapter/DatabaseAdapter'
 
 export function useVentas(adapter: DatabaseAdapter | null = null) {
-  const [data, setData] = useState<Venta[]>(mockVentas)
+  const [data, setData] = useState<Venta[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 

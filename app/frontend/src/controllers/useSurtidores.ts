@@ -1,10 +1,9 @@
 import { useState, useEffect, useCallback } from 'react'
 import { Surtidor } from '../models/Surtidor'
-import { mockSurtidores } from '../services/mockData'
 import { DatabaseAdapter } from '../patterns/adapter/DatabaseAdapter'
 
 export function useSurtidores(adapter: DatabaseAdapter | null = null) {
-  const [data, setData] = useState<Surtidor[]>(mockSurtidores)
+  const [data, setData] = useState<Surtidor[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 

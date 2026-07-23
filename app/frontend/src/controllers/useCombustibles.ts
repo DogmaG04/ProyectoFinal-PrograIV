@@ -1,10 +1,9 @@
 import { useState, useEffect } from 'react'
 import { Combustible } from '../models/Surtidor'
-import { COMBUSTIBLES } from '../services/mockData'
 import { DatabaseAdapter } from '../patterns/adapter/DatabaseAdapter'
 
 export function useCombustibles(adapter: DatabaseAdapter | null = null) {
-  const [data, setData] = useState<Combustible[]>(COMBUSTIBLES)
+  const [data, setData] = useState<Combustible[]>([])
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
