@@ -1,59 +1,92 @@
-import { mockSurtidores } from '../services/mockData'
+import { mockSurtidores, mockAlertas } from '../services/mockData'
 
 export default function Dashboard() {
   const totalSurtidores = mockSurtidores.length
   const criticos = mockSurtidores.filter(s => s.estadoNivel === 'critico').length
   const normales = mockSurtidores.filter(s => s.estadoNivel === 'normal').length
+  const activas = mockAlertas.filter(a => a.estado === 'activa').length
 
   return (
-    <div className="p-6">
-      <h1 className="text-2xl font-bold mb-6">Dashboard</h1>
+    <div>
+      <h1 className="text-text text-lg font-semibold mb-6 uppercase tracking-wider">Dashboard</h1>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
-        <div className="bg-white rounded-lg shadow p-6">
-          <p className="text-gray-500 text-sm">Total Surtidores</p>
-          <p className="text-3xl font-bold text-gray-800">{totalSurtidores}</p>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+        <div className="bg-panel border border-border p-5">
+          <p className="text-subtext text-[10px] uppercase tracking-widest mb-1">Ltrs Hoy</p>
+          <p className="text-cyan text-2xl font-bold">306.5L</p>
         </div>
-        <div className="bg-white rounded-lg shadow p-6">
-          <p className="text-gray-500 text-sm">Nivel Crítico</p>
-          <p className="text-3xl font-bold text-red-500">{criticos}</p>
+        <div className="bg-panel border border-border p-5">
+          <p className="text-subtext text-[10px] uppercase tracking-widest mb-1">Ingresos Hoy</p>
+          <p className="text-mint text-2xl font-bold">$343.75</p>
         </div>
-        <div className="bg-white rounded-lg shadow p-6">
-          <p className="text-gray-500 text-sm">Nivel Normal</p>
-          <p className="text-3xl font-bold text-green-500">{normales}</p>
+        <div className="bg-panel border border-border p-5">
+          <p className="text-subtext text-[10px] uppercase tracking-widest mb-1">Tanques Alerta</p>
+          <p className="text-red text-2xl font-bold">{criticos}</p>
+        </div>
+        <div className="bg-panel border border-border p-5">
+          <p className="text-subtext text-[10px] uppercase tracking-widest mb-1">Surtidores ON</p>
+          <p className="text-amber text-2xl font-bold">{normales}/{totalSurtidores}</p>
         </div>
       </div>
 
-      <h2 className="text-lg font-semibold mb-3">Estado de Surtidores</h2>
-      <div className="bg-white rounded-lg shadow overflow-hidden">
-        <table className="w-full text-left">
-          <thead className="bg-gray-100">
-            <tr>
-              <th className="px-4 py-3 text-sm font-medium text-gray-600">N°</th>
-              <th className="px-4 py-3 text-sm font-medium text-gray-600">Combustible</th>
-              <th className="px-4 py-3 text-sm font-medium text-gray-600">Nivel</th>
-              <th className="px-4 py-3 text-sm font-medium text-gray-600">Estado</th>
-            </tr>
-          </thead>
-          <tbody>
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="lg:col-span-2 bg-panel border border-border">
+          <div className="px-5 py-3 border-b border-border">
+            <h2 className="text-subtext text-xs uppercase tracking-widest">Estado de Surtidores</h2>
+          </div>
+          <div className="p-5 space-y-4">
             {mockSurtidores.map(s => (
-              <tr key={s.id} className="border-t">
-                <td className="px-4 py-3 text-sm">{s.numero}</td>
-                <td className="px-4 py-3 text-sm">{s.combustible}</td>
-                <td className="px-4 py-3 text-sm">{s.nivel}L / {s.capacidad}L</td>
-                <td className="px-4 py-3 text-sm">
-                  <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                    s.estadoNivel === 'critico' ? 'bg-red-100 text-red-700' :
-                    s.estadoNivel === 'bajo' ? 'bg-yellow-100 text-yellow-700' :
-                    'bg-green-100 text-green-700'
-                  }`}>
-                    {s.porcentajeNivel}%
-                  </span>
-                </td>
-              </tr>
+              <div key={s.id} className="flex items-center gap-4">
+                <span className="text-cyan text-sm font-semibold w-8">N°{s.numero}</span>
+                <div className="flex-1">
+                  <div className="flex justify-between text-[10px] text-subtext mb-1">
+                    <span>{s.combustible}</span>
+                    <span>{s.nivel}L / {s.capacidad}L</span>
+                  </div>
+                  <div className="w-full bg-border h-1.5 rounded-full overflow-hidden">
+                    <div
+                      className={`h-full rounded-full ${
+                        s.estadoNivel === 'critico' ? 'bg-red' :
+                        s.estadoNivel === 'bajo' ? 'bg-amber' : 'bg-mint'
+                      }`}
+                      style={{ width: `${s.porcentajeNivel}%` }}
+                    />
+                  </div>
+                </div>
+                <span className={`text-[10px] font-semibold w-12 text-right ${
+                  s.estadoNivel === 'critico' ? 'text-red' :
+                  s.estadoNivel === 'bajo' ? 'text-amber' : 'text-mint'
+                }`}>
+                  {s.porcentajeNivel}%
+                </span>
+              </div>
             ))}
-          </tbody>
-        </table>
+          </div>
+        </div>
+
+        <div className="bg-panel border border-border">
+          <div className="px-5 py-3 border-b border-border">
+            <h2 className="text-subtext text-xs uppercase tracking-widest">Alertas Activas</h2>
+          </div>
+          <div className="p-3">
+            {mockAlertas.filter(a => a.estado === 'activa').map(a => (
+              <div
+                key={a.id}
+                className={`p-3 mb-2 border-l-2 ${
+                  a.tipo === 'nivel_critico' ? 'border-red' : 'border-amber'
+                }`}
+              >
+                <p className={`text-xs font-semibold ${
+                  a.tipo === 'nivel_critico' ? 'text-red' : 'text-amber'
+                }`}>
+                  {a.tipo === 'nivel_critico' ? 'NIVEL CRÍTICO' : 'NIVEL BAJO'}
+                </p>
+                <p className="text-subtext text-[10px] mt-1">Surtidor N° {a.surtidor_id}</p>
+                <p className="text-subtext text-[10px] opacity-50 mt-0.5">{a.fecha}</p>
+              </div>
+            ))}
+          </div>
+        </div>
       </div>
     </div>
   )
