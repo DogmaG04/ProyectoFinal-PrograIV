@@ -1,0 +1,5 @@
+[phases.setup]
+nixPkgs = ["nodejs_20", "corepack"]
+
+[start]
+cmd = "cd app && pnpm start"
