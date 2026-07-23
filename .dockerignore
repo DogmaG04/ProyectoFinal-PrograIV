@@ -1,0 +1,7 @@
+app/backend/node_modules
+app/frontend/node_modules
+app/frontend/dist
+app/node_modules
+.git
+desarrollo
+docs
