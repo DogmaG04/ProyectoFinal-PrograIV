@@ -1,0 +1,5 @@
+[build]
+buildCommand = "cd app && pnpm install:all && pnpm build"
+
+[start]
+startCommand = "cd app && pnpm start"
