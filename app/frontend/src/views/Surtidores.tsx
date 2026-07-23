@@ -8,6 +8,7 @@ import ConfirmDialog from '../components/ConfirmDialog'
 import { showToast } from '../components/Toast'
 import { fmtNum, statusTagClass, getNivelClass, getNivelColor } from '../utils/uiHelpers'
 import { surtidorSchema, editarSurtidorSchema } from '../schemas'
+import Pagination from '../components/Pagination'
 
 export default function Surtidores() {
   const adapter = useAdapter()
@@ -25,6 +26,8 @@ export default function Surtidores() {
   const [guardando, setGuardando] = useState(false)
   const [errores, setErrores] = useState<Record<string, string>>({})
   const [touch, setTouch] = useState<Record<string, boolean>>({})
+  const [paginaSurt, setPaginaSurt] = useState(1)
+  const surtPorPagina = 6
 
   function validarCampo(campo: string, valor: string) {
     const datos = { tipo, codigo, ubicacion, [campo]: valor }
@@ -92,6 +95,9 @@ export default function Surtidores() {
     setConfirmarEliminar(null)
   }
 
+  const totalPaginasSurt = Math.ceil(surtidores.length / surtPorPagina)
+  const surtPagina = surtidores.slice((paginaSurt - 1) * surtPorPagina, paginaSurt * surtPorPagina)
+
   return (
     <div>
       <div className="flex justify-between items-center mb-5">
@@ -104,8 +110,9 @@ export default function Surtidores() {
         </button>
       </div>
 
-      <div className="grid grid-cols-2 gap-4">
-        {surtidores.map(s => {
+      <div className="bg-surface border border-border rounded-2xl overflow-hidden">
+      <div className="grid grid-cols-2 gap-4 p-4">
+        {surtPagina.map(s => {
           const gauges = s.surtidos.map(st => {
             const c = combustibles.find(x => x.id === st.combustibleId)
             if (!c) return null
@@ -153,6 +160,14 @@ export default function Surtidores() {
             </div>
           )
         })}
+      </div>
+      <Pagination
+        paginaActual={paginaSurt}
+        totalPaginas={totalPaginasSurt}
+        totalItems={surtidores.length}
+        itemsPorPagina={surtPorPagina}
+        onCambioPagina={setPaginaSurt}
+      />
       </div>
 
       <Modal abierto={modalCrear} titulo="Nuevo Surtidor" onClose={() => { setModalCrear(false); setErrores({}); setTouch({}) }}>

@@ -6,6 +6,7 @@ import Modal from '../components/Modal'
 import ConfirmDialog from '../components/ConfirmDialog'
 import { showToast } from '../components/Toast'
 import { alertaSchema } from '../schemas'
+import Pagination from '../components/Pagination'
 
 const labels: Record<string, string> = { todas: 'Todas', critica: 'Crítica', advertencia: 'Advertencia', info: 'Info' }
 const tipos = ['todas', 'critica', 'advertencia', 'info'] as const
@@ -61,6 +62,8 @@ export default function Alertas() {
   const [mensaje, setMensaje] = useState('')
   const [errores, setErrores] = useState<Record<string, string>>({})
   const [touch, setTouch] = useState<Record<string, boolean>>({})
+  const [paginaAlerta, setPaginaAlerta] = useState(1)
+  const alertasPorPagina = 7
 
   const counts: Record<string, number> = {}
   tipos.forEach(t => {
@@ -69,9 +72,12 @@ export default function Alertas() {
 
   const filtered = filter === 'todas' ? alertas : alertas.filter(a => a.tipo === filter)
 
-  const criticas = filtered.filter(a => a.tipo === 'critica')
-  const advertencias = filtered.filter(a => a.tipo === 'advertencia')
-  const infos = filtered.filter(a => a.tipo === 'info')
+  const totalPaginasAlerta = Math.ceil(filtered.length / alertasPorPagina)
+  const filteredPagina = filtered.slice((paginaAlerta - 1) * alertasPorPagina, paginaAlerta * alertasPorPagina)
+
+  const criticas = filteredPagina.filter(a => a.tipo === 'critica')
+  const advertencias = filteredPagina.filter(a => a.tipo === 'advertencia')
+  const infos = filteredPagina.filter(a => a.tipo === 'info')
 
   const secciones: { tipo: string; alertas: typeof filtered }[] = []
   if (filter === 'todas' || filter === 'critica') secciones.push({ tipo: 'critica', alertas: criticas })
@@ -200,6 +206,14 @@ export default function Alertas() {
           })}
         </div>
       )}
+
+      <Pagination
+        paginaActual={paginaAlerta}
+        totalPaginas={totalPaginasAlerta}
+        totalItems={filtered.length}
+        itemsPorPagina={alertasPorPagina}
+        onCambioPagina={setPaginaAlerta}
+      />
 
       <Modal abierto={modalNueva} titulo="Nueva Alerta" onClose={() => { setModalNueva(false); setErrores({}); setTouch({}) }}>
         <div className="flex flex-col gap-4">

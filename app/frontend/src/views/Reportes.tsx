@@ -7,6 +7,7 @@ import { useCombustibles } from '../controllers/useCombustibles'
 import { useAdapter } from '../services/adapterContext'
 import { decodificarReportes, decodificarVentas } from '../utils/decoders'
 import { fmt, fmtNum, statusTagClass } from '../utils/uiHelpers'
+import Pagination from '../components/Pagination'
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend)
 
@@ -17,12 +18,16 @@ export default function Reportes() {
   const { data: surtidores } = useSurtidores(adapter)
 
   const [mostrarBinario, setMostrarBinario] = useState(false)
+  const [paginaReporte, setPaginaReporte] = useState(1)
+  const reportesPorPagina = 7
 
   const precios: Record<number, number> = {}
   combustibles.forEach(c => { precios[c.id] = c.precioLitro })
 
   const reportes = decodificarReportes(ventas, combustibles)
   const ventasDecodificadas = decodificarVentas(ventas, precios)
+  const totalPaginasReporte = Math.ceil(ventasDecodificadas.length / reportesPorPagina)
+  const ventasDecPagina = ventasDecodificadas.slice((paginaReporte - 1) * reportesPorPagina, paginaReporte * reportesPorPagina)
 
   const porComb = combustibles.map(c => {
     const ventasC = ventas.filter(v => v.combustibleId === c.id)
@@ -206,7 +211,7 @@ export default function Reportes() {
               </tr>
             </thead>
             <tbody>
-              {ventasDecodificadas.map(v => (
+              {ventasDecPagina.map(v => (
                 <tr key={v.id} className="border-b border-border hover:bg-surface-hover transition-colors">
                   <td className="px-5 py-3 text-sm font-semibold text-text">{v.surtidor}</td>
                   <td className="px-5 py-3 text-sm text-text">{v.combustible}</td>
@@ -219,6 +224,13 @@ export default function Reportes() {
               ))}
             </tbody>
           </table>
+          <Pagination
+            paginaActual={paginaReporte}
+            totalPaginas={totalPaginasReporte}
+            totalItems={ventasDecodificadas.length}
+            itemsPorPagina={reportesPorPagina}
+            onCambioPagina={setPaginaReporte}
+          />
         </div>
       )}
     </div>

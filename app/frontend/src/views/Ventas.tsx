@@ -11,6 +11,7 @@ import ConfirmDialog from '../components/ConfirmDialog'
 import { showToast } from '../components/Toast'
 import { fmt, fmtNum } from '../utils/uiHelpers'
 import { ventaSchema } from '../schemas'
+import Pagination from '../components/Pagination'
 
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend, Filler)
 
@@ -36,6 +37,8 @@ export default function Ventas() {
   const [litros, setLitros] = useState<string>('')
   const [errores, setErrores] = useState<Record<string, string>>({})
   const [touch, setTouch] = useState<Record<string, boolean>>({})
+  const [paginaVenta, setPaginaVenta] = useState(1)
+  const ventasPorPagina = 7
 
   const litrosNum = parseFloat(litros) || 0
   const precioUnitario = combustibles.find(c => c.id === selCombustible)?.precioLitro || 0
@@ -94,6 +97,9 @@ export default function Ventas() {
       }
     })
   }, [ventas, campoFiltro, operador, valorFiltro])
+
+  const totalPaginasVentas = Math.ceil(filtradas.length / ventasPorPagina)
+  const ventasPagina = filtradas.slice((paginaVenta - 1) * ventasPorPagina, paginaVenta * ventasPorPagina)
 
   const totalVentas = filtradas.reduce((a, v) => a + v.total, 0)
   const totalLitros = filtradas.reduce((a, v) => a + v.litros, 0)
@@ -308,9 +314,9 @@ export default function Ventas() {
             </tr>
           </thead>
           <tbody>
-            {filtradas.map((v, i) => (
+            {ventasPagina.map((v, i) => (
               <tr key={v.id} className="border-b border-border hover:bg-surface-hover transition-colors">
-                <td className="px-5 py-3 text-sm text-tertiary">{i + 1}</td>
+                <td className="px-5 py-3 text-sm text-tertiary">{(paginaVenta - 1) * ventasPorPagina + i + 1}</td>
                 <td className="px-5 py-3 text-sm text-text">{v.fecha}</td>
                 <td className="px-5 py-3 text-sm font-semibold text-text">{v.surtidor}</td>
                 <td className="px-5 py-3 text-sm font-medium" style={{ color: getCombColor(v.combustibleId) }}>{v.combustible}</td>
@@ -338,6 +344,13 @@ export default function Ventas() {
             </tr>
           </tfoot>
         </table>
+        <Pagination
+          paginaActual={paginaVenta}
+          totalPaginas={totalPaginasVentas}
+          totalItems={filtradas.length}
+          itemsPorPagina={ventasPorPagina}
+          onCambioPagina={setPaginaVenta}
+        />
       </div>
 
       <Modal abierto={modalNueva} titulo="Registrar Venta" onClose={() => { setModalNueva(false); setErrores({}); setTouch({}) }}>
