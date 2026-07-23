@@ -1,5 +1,5 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
-import Navbar from './components/Navbar'
+import Layout from './components/Layout'
 import Dashboard from './views/Dashboard'
 import Surtidores from './views/Surtidores'
 import Ventas from './views/Ventas'
@@ -9,16 +9,15 @@ import Reportes from './views/Reportes'
 export default function App() {
   return (
     <BrowserRouter>
-      <div className="min-h-screen bg-gray-50">
-        <Navbar />
-        <Routes>
+      <Routes>
+        <Route element={<Layout />}>
           <Route path="/" element={<Dashboard />} />
           <Route path="/surtidores" element={<Surtidores />} />
           <Route path="/ventas" element={<Ventas />} />
           <Route path="/alertas" element={<Alertas />} />
           <Route path="/reportes" element={<Reportes />} />
-        </Routes>
-      </div>
+        </Route>
+      </Routes>
     </BrowserRouter>
   )
 }
