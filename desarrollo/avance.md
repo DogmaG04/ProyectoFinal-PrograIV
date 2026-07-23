@@ -52,6 +52,7 @@ Seguimiento del avance del proyecto. Última actualización: 2026-07-23
 - [x] Cliente Supabase en `services/supabase.ts`
 - [x] Función `verificarConexion()` con try/catch y mensajes en consola
 - [x] Función `sembrarDatos()` para poblar Supabase desde el navegador
+- [x] Auto-seed ejecutado al iniciar la app si las tablas están vacías
 - [x] Variables de entorno en `.env.example`
 - [x] Dependencia `@supabase/supabase-js`
 
@@ -100,6 +101,7 @@ Seguimiento del avance del proyecto. Última actualización: 2026-07-23
 
 | Hash | Descripción |
 |------|-------------|
+| `b6de969` | feat(frontend): auto-seed Supabase on app startup if empty |
 | `5fd60a5` | feat(backend): add seed function to populate Supabase with initial data |
 | `aa3b3a7` | feat(frontend): integrate all views with Supabase via custom hooks |
 | `e3162f7` | feat(frontend): call verificarConexion on app startup |
