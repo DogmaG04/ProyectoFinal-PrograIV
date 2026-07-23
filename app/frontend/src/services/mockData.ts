@@ -2,7 +2,7 @@ import { Surtidor } from '../models/Surtidor'
 import { Venta } from '../models/Venta'
 import { Alerta } from '../models/Alerta'
 
-export const mockSurtidores = [
+export const mockSurtidores: Surtidor[] = [
   new Surtidor({ id: 1, numero: 1, combustible: 'Regular', capacidad: 10000, nivel: 7500 }),
   new Surtidor({ id: 2, numero: 2, combustible: 'Premium', capacidad: 10000, nivel: 2000 }),
   new Surtidor({ id: 3, numero: 3, combustible: 'Diesel', capacidad: 8000, nivel: 1200 }),
@@ -10,7 +10,7 @@ export const mockSurtidores = [
   new Surtidor({ id: 5, numero: 5, combustible: 'Premium', capacidad: 10000, nivel: 5000 }),
 ]
 
-export const mockVentas = [
+export const mockVentas: Venta[] = [
   new Venta({ id: 1, fecha: '2026-07-20 08:30', combustible: 'Regular', litros: 45.5, precio: 1.10, total: 50.05, surtidor_id: 1 }),
   new Venta({ id: 2, fecha: '2026-07-20 09:15', combustible: 'Premium', litros: 30.0, precio: 1.35, total: 40.50, surtidor_id: 2 }),
   new Venta({ id: 3, fecha: '2026-07-20 10:00', combustible: 'Diesel', litros: 60.2, precio: 0.95, total: 57.19, surtidor_id: 3 }),
@@ -21,7 +21,7 @@ export const mockVentas = [
   new Venta({ id: 8, fecha: '2026-07-20 16:45', combustible: 'Regular', litros: 20.0, precio: 1.10, total: 22.00, surtidor_id: 1 }),
 ]
 
-export const mockAlertas = [
+export const mockAlertas: Alerta[] = [
   new Alerta({ id: 1, surtidor_id: 3, tipo: 'nivel_critico', fecha: '2026-07-20 10:30', estado: 'activa' }),
   new Alerta({ id: 2, surtidor_id: 2, tipo: 'nivel_bajo', fecha: '2026-07-20 09:00', estado: 'activa' }),
   new Alerta({ id: 3, surtidor_id: 1, tipo: 'mantenimiento', fecha: '2026-07-19 14:00', estado: 'resuelta' }),
