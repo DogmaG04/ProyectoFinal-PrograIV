@@ -23,6 +23,8 @@ export default function Ventas() {
   const [confirmarEliminar, setConfirmarEliminar] = useState<number | null>(null)
   const [guardando, setGuardando] = useState(false)
 
+  const [busqueda, setBusqueda] = useState('')
+
   const [selSurtidor, setSelSurtidor] = useState<number>(0)
   const [selCombustible, setSelCombustible] = useState<number>(0)
   const [litros, setLitros] = useState<string>('')
@@ -46,12 +48,22 @@ export default function Ventas() {
 
   const horas: Record<string, number> = {}
   ventas.forEach(v => {
-    const h = v.fecha.split(' ')[1]?.split(':')[0] || '00'
+    const h = String(new Date(v.fecha).getHours()).padStart(2, '0')
     horas[h] = (horas[h] || 0) + v.total
   })
   const sorted = Object.keys(horas).sort()
   const lineLabels = sorted.map(h => h + ':00')
   const lineData = sorted.map(h => horas[h])
+
+  const filtradas = busqueda.trim()
+    ? ventas.filter(v =>
+        v.surtidor.toLowerCase().includes(busqueda.toLowerCase()) ||
+        v.combustible.toLowerCase().includes(busqueda.toLowerCase()) ||
+        v.fecha.includes(busqueda) ||
+        v.total.toString().includes(busqueda) ||
+        v.litros.toString().includes(busqueda)
+      )
+    : ventas
 
   async function handleCrear() {
     if (!selSurtidor || !selCombustible || litrosNum <= 0) return
@@ -146,7 +158,16 @@ export default function Ventas() {
       <div className="bg-surface border border-border rounded-2xl overflow-hidden">
         <div className="px-5 py-3.5 border-b border-border flex items-center justify-between">
           <span className="text-base font-bold text-text">Registro de Ventas</span>
-          <span className="text-xs text-tertiary bg-surface-hover px-2.5 py-1 rounded-full">{ventas.length} registros</span>
+          <div className="flex items-center gap-3">
+            <input
+              type="text"
+              value={busqueda}
+              onChange={e => setBusqueda(e.target.value)}
+              placeholder="Buscar surtidor, combustible, fecha..."
+              className="px-3 py-1.5 border border-border rounded-lg bg-bg text-text text-xs outline-none w-64"
+            />
+            <span className="text-xs text-tertiary bg-surface-hover px-2.5 py-1 rounded-full">{filtradas.length} registros</span>
+          </div>
         </div>
         <table className="w-full border-collapse">
           <thead>
@@ -161,7 +182,7 @@ export default function Ventas() {
             </tr>
           </thead>
           <tbody>
-            {ventas.map((v, i) => (
+            {filtradas.map((v, i) => (
               <tr key={v.id} className="border-b border-border hover:bg-surface-hover transition-colors">
                 <td className="px-5 py-3 text-sm text-tertiary">{i + 1}</td>
                 <td className="px-5 py-3 text-sm text-text">{v.fecha}</td>
@@ -185,8 +206,8 @@ export default function Ventas() {
           <tfoot>
             <tr className="font-bold text-text border-t-2 border-border bg-surface-hover">
               <td colSpan={4} className="px-5 py-3 text-sm">TOTAL</td>
-              <td className="px-5 py-3 text-sm">{fmtNum(totalLitros)} L</td>
-              <td className="px-5 py-3 text-sm">{fmt(totalVentas)}</td>
+              <td className="px-5 py-3 text-sm">{fmtNum(filtradas.reduce((a, v) => a + v.litros, 0))} L</td>
+              <td className="px-5 py-3 text-sm">{fmt(filtradas.reduce((a, v) => a + v.total, 0))}</td>
               <td></td>
             </tr>
           </tfoot>
