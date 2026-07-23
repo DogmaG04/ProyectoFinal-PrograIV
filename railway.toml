@@ -1,6 +1,5 @@
 [build]
 builder = "nixpacks"
-buildCommand = "corepack enable && cd app && pnpm install:all && pnpm build"
 
 [deploy]
-startCommand = "corepack enable && cd app && pnpm start"
+startCommand = "cd app && pnpm start"
