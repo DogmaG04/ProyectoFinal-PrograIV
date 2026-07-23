@@ -7,6 +7,7 @@ import { useAlertas } from '../controllers/useAlertas'
 import { useCombustibles } from '../controllers/useCombustibles'
 import { useAdapter } from '../services/adapterContext'
 import { fmt, fmtNum, statusTagClass } from '../utils/uiHelpers'
+import Pagination from '../components/Pagination'
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, ArcElement, Title, Tooltip, Legend)
 
@@ -18,6 +19,10 @@ export default function Dashboard() {
   const { data: combustibles } = useCombustibles(adapter)
 
   const [slideIdx, setSlideIdx] = useState(0)
+  const [paginaSurt, setPaginaSurt] = useState(1)
+  const [paginaAlertas, setPaginaAlertas] = useState(1)
+  const surtPorPagina = 4
+  const alertasPorPagina = 5
   const slidesPorVista = 2
   const totalSlides = Math.ceil(surtidores.length / slidesPorVista)
   const parActual = surtidores.slice(slideIdx * slidesPorVista, slideIdx * slidesPorVista + slidesPorVista)
@@ -37,6 +42,12 @@ export default function Dashboard() {
   surtidores.forEach(s => { porEstado[s.estado] = (porEstado[s.estado] || 0) + 1 })
   const estadoColors: Record<string, string> = { activo: '#34d399', mantenimiento: '#fbbf24', 'fuera de servicio': '#f87171' }
   const estadoLabels = Object.keys(porEstado)
+
+  const alertasOrdenadas = [...alertas].sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime())
+  const totalPaginasSurt = Math.ceil(surtidores.length / surtPorPagina)
+  const surtPagina = surtidores.slice((paginaSurt - 1) * surtPorPagina, paginaSurt * surtPorPagina)
+  const totalPaginasAlertas = Math.ceil(alertasOrdenadas.length / alertasPorPagina)
+  const alertasPagina = alertasOrdenadas.slice((paginaAlertas - 1) * alertasPorPagina, paginaAlertas * alertasPorPagina)
 
   return (
     <div>
@@ -77,7 +88,7 @@ export default function Dashboard() {
               </tr>
             </thead>
             <tbody>
-              {surtidores.map(s => (
+              {surtPagina.map(s => (
                 <tr key={s.id} className="border-b border-border hover:bg-surface-hover transition-colors">
                   <td className="px-5 py-3 text-sm font-semibold text-text">{s.codigo}</td>
                   <td className="px-5 py-3 text-sm text-subtext">{s.ubicacion}</td>
@@ -90,6 +101,13 @@ export default function Dashboard() {
               ))}
             </tbody>
           </table>
+          <Pagination
+            paginaActual={paginaSurt}
+            totalPaginas={totalPaginasSurt}
+            totalItems={surtidores.length}
+            itemsPorPagina={surtPorPagina}
+            onCambioPagina={setPaginaSurt}
+          />
         </div>
 
         <div className="bg-surface border border-border rounded-2xl overflow-hidden flex flex-col">
@@ -170,13 +188,13 @@ export default function Dashboard() {
       </div>
 
       <div className="mb-6">
-        <div className="bg-surface border border-border rounded-2xl">
+        <div className="bg-surface border border-border rounded-2xl overflow-hidden">
           <div className="px-5 py-3.5 border-b border-border flex items-center justify-between">
             <span className="text-base font-bold text-text">Alertas Recientes</span>
             <span className="text-xs text-tertiary bg-surface-hover px-2.5 py-1 rounded-full">{alertas.length} total</span>
           </div>
           <div className="p-3 flex flex-col gap-2.5">
-            {alertas.slice(0, 5).map(a => (
+            {alertasPagina.map(a => (
               <div key={a.id} className={`bg-surface border border-border border-l-4 ${a.tipo === 'critica' ? 'border-l-danger' : a.tipo === 'advertencia' ? 'border-l-warning' : 'border-l-primary'} rounded-2xl p-4 flex items-start justify-between gap-4 hover:bg-surface-hover transition-colors`}>
                 <div className="flex flex-col gap-1.5 flex-1">
                   <span className="text-sm font-medium text-text">{a.mensaje}</span>
@@ -191,6 +209,13 @@ export default function Dashboard() {
               </div>
             ))}
           </div>
+          <Pagination
+            paginaActual={paginaAlertas}
+            totalPaginas={totalPaginasAlertas}
+            totalItems={alertasOrdenadas.length}
+            itemsPorPagina={alertasPorPagina}
+            onCambioPagina={setPaginaAlertas}
+          />
         </div>
       </div>
 
