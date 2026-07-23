@@ -57,7 +57,7 @@ export default function Dashboard() {
         </div>
       </div>
 
-      <div className="mb-6">
+      <div className="grid grid-cols-2 gap-4 mb-6">
         <div className="bg-surface border border-border rounded-2xl overflow-hidden">
           <div className="px-5 py-3.5 border-b border-border">
             <span className="text-base font-bold text-text">Estado de Surtidores</span>
@@ -68,7 +68,6 @@ export default function Dashboard() {
                 <th className="text-left px-5 py-3.5 text-xs font-semibold text-subtext">Código</th>
                 <th className="text-left px-5 py-3.5 text-xs font-semibold text-subtext">Ubicación</th>
                 <th className="text-left px-5 py-3.5 text-xs font-semibold text-subtext">Estado</th>
-                <th className="text-left px-5 py-3.5 text-xs font-semibold text-subtext">Niveles</th>
               </tr>
             </thead>
             <tbody>
@@ -81,29 +80,39 @@ export default function Dashboard() {
                       {s.estado}
                     </span>
                   </td>
-                  <td className="px-5 py-3">
-                    <div className="flex flex-wrap gap-2.5">
-                      {s.surtidos.length > 0
-                        ? s.surtidos.map(st => {
-                            const c = combustibles.find(x => x.id === st.combustibleId)
-                            const pct = (st.nivel / st.capacidad) * 100
-                            return (
-                              <div key={st.combustibleId} className="flex items-center gap-1.5">
-                                <div className="w-[72px] h-2 rounded-full overflow-hidden bg-surface-hover">
-                                  <div className="h-full rounded-full" style={{ width: `${pct}%`, background: c?.color || '#6b7280' }} />
-                                </div>
-                                <span className="text-[11px] text-subtext whitespace-nowrap">{c?.nombre?.split(' ')[0] || '?'} {Math.round(pct)}%</span>
-                              </div>
-                            )
-                          })
-                        : <span className="text-xs text-tertiary italic">Sin datos</span>
-                      }
-                    </div>
-                  </td>
                 </tr>
               ))}
             </tbody>
           </table>
+        </div>
+
+        <div className="bg-surface border border-border rounded-2xl overflow-hidden">
+          <div className="px-5 py-3.5 border-b border-border">
+            <span className="text-base font-bold text-text">Niveles de Combustible</span>
+          </div>
+          <div className="p-4 flex flex-col gap-4">
+            {surtidores.map(s => (
+              <div key={s.id} className="flex flex-col gap-2">
+                <span className="text-sm font-semibold text-text">{s.codigo}</span>
+                {s.surtidos.length > 0
+                  ? s.surtidos.map(st => {
+                      const c = combustibles.find(x => x.id === st.combustibleId)
+                      const pct = (st.nivel / st.capacidad) * 100
+                      return (
+                        <div key={st.combustibleId} className="flex items-center gap-2.5">
+                          <span className="text-[11px] text-subtext w-[90px] truncate">{c?.nombre || '?'}</span>
+                          <div className="flex-1 h-2.5 rounded-full overflow-hidden bg-surface-hover">
+                            <div className="h-full rounded-full" style={{ width: `${pct}%`, background: c?.color || '#6b7280' }} />
+                          </div>
+                          <span className="text-[11px] text-subtext font-medium w-[36px] text-right">{Math.round(pct)}%</span>
+                        </div>
+                      )
+                    })
+                  : <span className="text-xs text-tertiary italic">Sin datos</span>
+                }
+              </div>
+            ))}
+          </div>
         </div>
       </div>
 
