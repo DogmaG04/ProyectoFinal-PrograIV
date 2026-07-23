@@ -159,7 +159,7 @@ export default function Ventas() {
             ))}
           </div>
 
-          <span className="text-xs text-tertiary">→ Seleccionar campo</span>
+          <span className="text-xs text-tertiary">Seleccionar campo</span>
 
           {usaNumero && (
             <>
@@ -178,7 +178,7 @@ export default function Ventas() {
                   </button>
                 ))}
               </div>
-              <span className="text-xs text-tertiary">→ Operador</span>
+              <span className="text-xs text-tertiary">Operador</span>
             </>
           )}
 
@@ -195,7 +195,7 @@ export default function Ventas() {
                   </button>
                 ))}
               </div>
-              <span className="text-xs text-tertiary">→ Seleccionar valor</span>
+              <span className="text-xs text-tertiary">Seleccionar valor</span>
             </>
           ) : (
             <>
@@ -206,7 +206,7 @@ export default function Ventas() {
                 placeholder={placeholderCampo[campoFiltro]}
                 className="px-3 py-1.5 border border-border rounded-lg bg-bg text-text text-xs outline-none w-48"
               />
-              <span className="text-xs text-tertiary">→ {usaNumero ? 'Ingrese un valor' : 'Escriba para buscar'}</span>
+              <span className="text-xs text-tertiary">{usaNumero ? 'Ingrese un valor' : 'Escriba para buscar'}</span>
             </>
           )}
 
