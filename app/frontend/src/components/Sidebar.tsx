@@ -30,57 +30,66 @@ const navItems = [
 
 interface SidebarProps {
   onLogout?: () => void
+  isOpen: boolean
+  onClose: () => void
 }
 
-export default function Sidebar({ onLogout }: SidebarProps) {
+export default function Sidebar({ onLogout, isOpen, onClose }: SidebarProps) {
   return (
-    <aside className="w-60 min-h-screen bg-surface border-r border-border flex flex-col fixed left-0 top-0">
-      <div className="p-5 border-b border-border flex items-center gap-3">
-        <div className="w-10 h-10 bg-primary rounded-xl flex items-center justify-center text-white font-bold text-lg">
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 22V6a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v16"/><path d="M15 10h2a2 2 0 0 1 2 2v2a2 2 0 0 0 2 2h0a2 2 0 0 0 2-2V9.83a2 2 0 0 0-.59-1.42L18 4"/><path d="M3 22h12"/><circle cx="8" cy="10" r="1" fill="currentColor"/></svg>
+    <>
+      <div
+        className={`fixed inset-0 bg-black/60 z-30 transition-opacity md:hidden ${isOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}
+        onClick={onClose}
+      />
+      <aside className={`fixed top-0 left-0 z-40 h-screen w-60 bg-surface border-r border-border flex flex-col transition-transform duration-300 md:translate-x-0 ${isOpen ? 'translate-x-0' : '-translate-x-full'}`}>
+        <div className="p-5 border-b border-border flex items-center gap-3">
+          <div className="w-10 h-10 bg-primary rounded-xl flex items-center justify-center text-white font-bold text-lg">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 22V6a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v16"/><path d="M15 10h2a2 2 0 0 1 2 2v2a2 2 0 0 0 2 2h0a2 2 0 0 0 2-2V9.83a2 2 0 0 0-.59-1.42L18 4"/><path d="M3 22h12"/><circle cx="8" cy="10" r="1" fill="currentColor"/></svg>
+          </div>
+          <div>
+            <h1 className="text-text font-bold text-sm">Celeron Control</h1>
+            <p className="text-tertiary text-[11px]">Surtidores Bolivia</p>
+          </div>
         </div>
-        <div>
-          <h1 className="text-text font-bold text-sm">Celeron Control</h1>
-          <p className="text-tertiary text-[11px]">Surtidores Bolivia</p>
-        </div>
-      </div>
 
-      <nav className="flex-1 p-3 flex flex-col gap-1">
-        {navItems.map(({ to, label, icon }) => (
-          <NavLink
-            key={to}
-            to={to}
-            end={to === '/'}
-            className={({ isActive }) =>
-              `flex items-center gap-3 px-4 py-3 text-sm font-medium rounded-xl transition-all ${
-                isActive
-                  ? 'bg-primary-light text-primary font-semibold'
-                  : 'text-subtext hover:text-text hover:bg-surface-hover'
-              }`
-            }
+        <nav className="flex-1 p-3 flex flex-col gap-1">
+          {navItems.map(({ to, label, icon }) => (
+            <NavLink
+              key={to}
+              to={to}
+              end={to === '/'}
+              onClick={onClose}
+              className={({ isActive }) =>
+                `flex items-center gap-3 px-4 py-3 text-sm font-medium rounded-xl transition-all ${
+                  isActive
+                    ? 'bg-primary-light text-primary font-semibold'
+                    : 'text-subtext hover:text-text hover:bg-surface-hover'
+                }`
+              }
+            >
+              <span className="w-5 h-5 flex items-center justify-center">{icon}</span>
+              <span>{label}</span>
+            </NavLink>
+          ))}
+        </nav>
+
+        <div className="p-3 border-t border-border">
+          <button
+            onClick={onLogout}
+            className="flex items-center gap-3 px-4 py-3 text-sm font-medium rounded-xl text-subtext hover:text-danger hover:bg-danger-light transition-all w-full"
           >
-            <span className="w-5 h-5 flex items-center justify-center">{icon}</span>
-            <span>{label}</span>
-          </NavLink>
-        ))}
-      </nav>
-
-      <div className="p-3 border-t border-border">
-        <button
-          onClick={onLogout}
-          className="flex items-center gap-3 px-4 py-3 text-sm font-medium rounded-xl text-subtext hover:text-danger hover:bg-danger-light transition-all w-full"
-        >
-          <span className="w-5 h-5 flex items-center justify-center">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
-              <polyline points="16 17 21 12 16 7"/>
-              <line x1="21" y1="12" x2="9" y2="12"/>
-            </svg>
-          </span>
-          <span>Cerrar Sesión</span>
-        </button>
-        <p className="text-[11px] text-tertiary text-center mt-2">v1.0.0 — Precios ANH 2026</p>
-      </div>
-    </aside>
+            <span className="w-5 h-5 flex items-center justify-center">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+                <polyline points="16 17 21 12 16 7"/>
+                <line x1="21" y1="12" x2="9" y2="12"/>
+              </svg>
+            </span>
+            <span>Cerrar Sesión</span>
+          </button>
+          <p className="text-[11px] text-tertiary text-center mt-2">v1.0.0 — Precios ANH 2026</p>
+        </div>
+      </aside>
+    </>
   )
 }

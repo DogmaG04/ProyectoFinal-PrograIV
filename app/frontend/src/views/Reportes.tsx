@@ -61,8 +61,8 @@ export default function Reportes() {
 
   return (
     <div>
-      <div className="flex justify-between items-center mb-4">
-        <span className="text-base font-bold text-text">Resumen por Combustible</span>
+      <div className="flex flex-wrap justify-between items-center gap-2 mb-4">
+        <span className="text-sm md:text-base font-bold text-text">Resumen por Combustible</span>
         <button
           onClick={() => setMostrarBinario(!mostrarBinario)}
           className={`px-4 py-2 rounded-xl text-xs font-medium border transition-all ${
@@ -75,9 +75,9 @@ export default function Reportes() {
         </button>
       </div>
 
-      <div className="grid grid-cols-3 gap-4 mb-6">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
         {porComb.map((c, i) => (
-          <div key={c.id} className="bg-surface border border-border rounded-2xl p-5">
+          <div key={c.id} className="bg-surface border border-border rounded-2xl p-3 sm:p-5">
             <div className="flex items-center gap-2.5 pb-3 mb-4 border-b border-border">
               <span className="w-2.5 h-2.5 rounded-full" style={{ background: c.color }} />
               <span className="text-sm font-bold" style={{ color: c.color }}>{c.nombre}</span>
@@ -102,9 +102,9 @@ export default function Reportes() {
 
       <div className="bg-surface border border-border rounded-2xl p-5 mb-6">
         <div className="mb-3">
-          <span className="text-base font-bold text-text">Litros Vendidos por Combustible</span>
+          <span className="text-sm md:text-base font-bold text-text">Litros Vendidos por Combustible</span>
         </div>
-        <div className="relative h-[260px]">
+        <div className="relative min-h-[250px] md:min-h-[300px]">
           <Bar
             data={{
               labels: porComb.map(c => c.nombre),
@@ -133,11 +133,11 @@ export default function Reportes() {
       </div>
 
       <div className="mb-4">
-        <span className="text-base font-bold text-text">Resumen por Surtidor</span>
+        <span className="text-sm md:text-base font-bold text-text">Resumen por Surtidor</span>
       </div>
-      <div className="grid grid-cols-2 gap-4 mb-6">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-6">
         {porSurt.map(s => (
-          <div key={s.id} className="bg-surface border border-border rounded-2xl p-5">
+          <div key={s.id} className="bg-surface border border-border rounded-2xl p-3 sm:p-5">
             <div className="flex items-center justify-between mb-3">
               <span className="text-sm font-bold text-subtext uppercase tracking-wide">{s.codigo} — {s.ubicacion}</span>
               <span className={`inline-flex items-center px-3 py-1 rounded-full text-[11px] font-semibold uppercase tracking-wide ${statusTagClass(s.estado)}`}>
@@ -164,9 +164,9 @@ export default function Reportes() {
 
       <div className="bg-surface border border-border rounded-2xl p-5">
         <div className="mb-3">
-          <span className="text-base font-bold text-text">Ventas por Surtidor</span>
+          <span className="text-sm md:text-base font-bold text-text">Ventas por Surtidor</span>
         </div>
-        <div className="relative h-[260px]">
+        <div className="relative min-h-[250px] md:min-h-[300px]">
           <Bar
             data={{
               labels: porSurt.map(s => s.codigo),
@@ -196,9 +196,10 @@ export default function Reportes() {
       {mostrarBinario && (
         <div className="mt-6 bg-surface border border-border rounded-2xl overflow-hidden">
           <div className="px-5 py-3.5 border-b border-border">
-            <span className="text-base font-bold text-text">Ventas Decodificadas (Binario)</span>
+            <span className="text-sm md:text-base font-bold text-text">Ventas Decodificadas (Binario)</span>
           </div>
-          <table className="w-full border-collapse">
+          <div className="overflow-x-auto">
+            <table className="w-full border-collapse min-w-[350px] md:min-w-[480px]">
             <thead>
               <tr className="bg-surface-hover">
                 <th className="text-left px-5 py-3.5 text-xs font-semibold text-subtext">Surtidor</th>
@@ -223,7 +224,8 @@ export default function Reportes() {
                 </tr>
               ))}
             </tbody>
-          </table>
+            </table>
+          </div>
           <Pagination
             paginaActual={paginaReporte}
             totalPaginas={totalPaginasReporte}

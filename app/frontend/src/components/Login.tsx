@@ -64,17 +64,17 @@ export default function Login({ onLogin }: LoginProps) {
 
   return (
     <div
-      className={`fixed inset-0 z-50 flex items-center justify-center bg-bg transition-opacity duration-400 ${
+      className={`fixed inset-0 z-50 flex items-center justify-center bg-bg transition-opacity duration-400 px-6 py-4 md:px-12 md:py-8 ${
         hidden ? 'opacity-0 pointer-events-none' : ''
       }`}
     >
-      <div className="flex items-center gap-6 max-w-[90vw]">
-        <div className="bg-surface border border-border rounded-3xl p-12 w-[400px] shadow-lg text-center">
+      <div className="grid grid-cols-1 md:grid-cols-[1fr_340px] items-center gap-4 md:gap-6 max-w-[90vw]">
+        <div className="bg-surface border border-border rounded-3xl p-4 sm:p-6 md:p-8 w-full md:w-[400px] shadow-lg text-center">
           <div className="mb-9">
             <div className="w-14 h-14 bg-primary rounded-2xl inline-flex items-center justify-center text-white mb-4">
               <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 22V6a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v16"/><path d="M15 10h2a2 2 0 0 1 2 2v2a2 2 0 0 0 2 2h0a2 2 0 0 0 2-2V9.83a2 2 0 0 0-.59-1.42L18 4"/><path d="M3 22h12"/><circle cx="8" cy="10" r="1" fill="currentColor"/></svg>
             </div>
-            <h1 className="text-text text-[22px] font-bold mb-1">Celeron Control</h1>
+            <h1 className="text-text text-lg md:text-xl font-bold mb-1">Celeron Control</h1>
             <p className="text-tertiary text-sm">Sistema de Monitoreo de Surtidores</p>
           </div>
 
@@ -88,7 +88,7 @@ export default function Login({ onLogin }: LoginProps) {
                 onBlur={() => handleBlur('email')}
                 placeholder="admin@gmail.com"
                 autoFocus
-                className={`w-full px-4 py-3 border rounded-xl bg-bg text-text text-sm outline-none transition-colors ${
+                className={`w-full px-4 h-11 md:h-12 border rounded-xl bg-bg text-text text-sm outline-none transition-colors ${
                   touch.email && errores.email ? 'border-danger' : 'border-border focus:border-primary'
                 }`}
               />
@@ -104,7 +104,7 @@ export default function Login({ onLogin }: LoginProps) {
                 onChange={e => { setPassword(e.target.value); if (touch.password) validarCampo('password', e.target.value) }}
                 onBlur={() => handleBlur('password')}
                 placeholder="••••••••"
-                className={`w-full px-4 py-3 border rounded-xl bg-bg text-text text-sm outline-none transition-colors ${
+                className={`w-full px-4 h-11 md:h-12 border rounded-xl bg-bg text-text text-sm outline-none transition-colors ${
                   touch.password && errores.password ? 'border-danger' : 'border-border focus:border-primary'
                 }`}
               />
@@ -115,14 +115,14 @@ export default function Login({ onLogin }: LoginProps) {
             <button
               type="submit"
               disabled={logginIn}
-              className="w-full py-3.5 bg-primary text-white rounded-xl font-semibold text-sm mt-2 transition-opacity hover:opacity-90 disabled:opacity-50 disabled:cursor-default"
+              className="w-full h-11 md:h-12 bg-primary text-white rounded-xl font-semibold text-sm mt-2 transition-opacity hover:opacity-90 disabled:opacity-50 disabled:cursor-default"
             >
               {logginIn ? 'Ingresando...' : 'Iniciar Sesión'}
             </button>
           </form>
         </div>
 
-        <div className="bg-surface border border-border rounded-2xl p-5 w-[220px] shadow-lg relative">
+        <div className="bg-surface border border-border rounded-2xl p-3 md:p-5 mt-6 md:mt-10 w-full md:w-[220px] shadow-lg relative">
           <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-primary text-white text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-wider">
             Credenciales
           </div>
