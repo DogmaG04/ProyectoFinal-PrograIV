@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import { Bar, Doughnut } from 'react-chartjs-2'
 import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, ArcElement, Title, Tooltip, Legend } from 'chart.js'
 import { useSurtidores } from '../controllers/useSurtidores'
@@ -16,6 +17,8 @@ export default function Dashboard() {
   const { data: alertas } = useAlertas(adapter)
   const { data: combustibles } = useCombustibles(adapter)
 
+  const [slideIdx, setSlideIdx] = useState(0)
+
   const totalLitros = ventas.reduce((a, v) => a + v.litros, 0)
   const totalVentas = ventas.reduce((a, v) => a + v.total, 0)
   const activos = surtidores.filter(s => s.estado === 'activo').length
@@ -31,6 +34,8 @@ export default function Dashboard() {
   surtidores.forEach(s => { porEstado[s.estado] = (porEstado[s.estado] || 0) + 1 })
   const estadoColors: Record<string, string> = { activo: '#34d399', mantenimiento: '#fbbf24', 'fuera de servicio': '#f87171' }
   const estadoLabels = Object.keys(porEstado)
+
+  const surtidorActual = surtidores[slideIdx]
 
   return (
     <div>
@@ -86,33 +91,76 @@ export default function Dashboard() {
           </table>
         </div>
 
-        <div className="bg-surface border border-border rounded-2xl overflow-hidden">
-          <div className="px-5 py-3.5 border-b border-border">
+        <div className="bg-surface border border-border rounded-2xl overflow-hidden flex flex-col">
+          <div className="px-5 py-3.5 border-b border-border flex items-center justify-between">
             <span className="text-base font-bold text-text">Niveles de Combustible</span>
+            {surtidores.length > 0 && (
+              <span className="text-xs text-tertiary bg-surface-hover px-2.5 py-1 rounded-full">
+                {slideIdx + 1} / {surtidores.length}
+              </span>
+            )}
           </div>
-          <div className="p-4 flex flex-col gap-4">
-            {surtidores.map(s => (
-              <div key={s.id} className="flex flex-col gap-2">
-                <span className="text-sm font-semibold text-text">{s.codigo}</span>
-                {s.surtidos.length > 0
-                  ? s.surtidos.map(st => {
+          <div className="flex-1 flex flex-col items-center justify-center p-6 min-h-[240px]">
+            {surtidorActual ? (
+              <div className="flex flex-col items-center gap-5 w-full">
+                <div className="text-center">
+                  <span className="text-lg font-bold text-text">{surtidorActual.codigo}</span>
+                  <span className="block text-xs text-tertiary mt-0.5">{surtidorActual.ubicacion}</span>
+                </div>
+                {surtidorActual.surtidos.length > 0 ? (
+                  <div className="flex items-end justify-center gap-6">
+                    {surtidorActual.surtidos.map(st => {
                       const c = combustibles.find(x => x.id === st.combustibleId)
                       const pct = (st.nivel / st.capacidad) * 100
                       return (
-                        <div key={st.combustibleId} className="flex items-center gap-2.5">
-                          <span className="text-[11px] text-subtext w-[90px] truncate">{c?.nombre || '?'}</span>
-                          <div className="flex-1 h-2.5 rounded-full overflow-hidden bg-surface-hover">
-                            <div className="h-full rounded-full" style={{ width: `${pct}%`, background: c?.color || '#6b7280' }} />
+                        <div key={st.combustibleId} className="flex flex-col items-center gap-2">
+                          <span className="text-xs font-semibold text-text">{Math.round(pct)}%</span>
+                          <div className="w-8 h-[110px] bg-surface-hover rounded-full overflow-hidden relative">
+                            <div
+                              className="absolute bottom-0 left-0 w-full rounded-full transition-all duration-500"
+                              style={{ height: `${pct}%`, background: c?.color || '#6b7280' }}
+                            />
                           </div>
-                          <span className="text-[11px] text-subtext font-medium w-[36px] text-right">{Math.round(pct)}%</span>
+                          <span className="text-[10px] text-subtext text-center leading-tight max-w-[64px]">
+                            {c?.nombre || '?'}
+                          </span>
                         </div>
                       )
-                    })
-                  : <span className="text-xs text-tertiary italic">Sin datos</span>
-                }
+                    })}
+                  </div>
+                ) : (
+                  <span className="text-xs text-tertiary italic">Sin datos de combustible</span>
+                )}
               </div>
-            ))}
+            ) : (
+              <span className="text-xs text-tertiary italic">No hay surtidores</span>
+            )}
           </div>
+          {surtidores.length > 1 && (
+            <div className="px-5 pb-4 flex items-center justify-between">
+              <button
+                onClick={() => setSlideIdx(i => (i - 1 + surtidores.length) % surtidores.length)}
+                className="w-8 h-8 rounded-full bg-surface-hover hover:bg-primary/20 text-subtext hover:text-primary flex items-center justify-center transition-colors text-lg font-bold cursor-pointer"
+              >
+                &#8249;
+              </button>
+              <div className="flex gap-1.5">
+                {surtidores.map((_, i) => (
+                  <button
+                    key={i}
+                    onClick={() => setSlideIdx(i)}
+                    className={`h-2 rounded-full transition-all duration-300 cursor-pointer ${i === slideIdx ? 'bg-primary w-5' : 'bg-surface-hover hover:bg-subtext w-2'}`}
+                  />
+                ))}
+              </div>
+              <button
+                onClick={() => setSlideIdx(i => (i + 1) % surtidores.length)}
+                className="w-8 h-8 rounded-full bg-surface-hover hover:bg-primary/20 text-subtext hover:text-primary flex items-center justify-center transition-colors text-lg font-bold cursor-pointer"
+              >
+                &#8250;
+              </button>
+            </div>
+          )}
         </div>
       </div>
 
