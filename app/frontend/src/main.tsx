@@ -2,9 +2,9 @@ import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import './index.css'
 import App from './App'
-import { verificarConexion } from './services/supabase'
+import { verificarConexion, sembrarDatos } from './services/supabase'
 
-verificarConexion()
+verificarConexion().then(ok => { if (ok) sembrarDatos() })
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
