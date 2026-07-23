@@ -55,17 +55,20 @@ Seguimiento del avance del proyecto. Última actualización: 2026-07-23
   - `useSurtidores` — `cargar()`, `crear()`, `editar()`, `eliminar()`
   - `useVentas` — `cargar()`, `registrar()`, `eliminar()`
   - `useAlertas` — `cargar()`, `crear()`, `eliminar()` + integración Observer
-  - `useCombustibles` — `cargar()` con fallback a mockData
+  - `useCombustibles` — `cargar()`
+- [x] Auto-refresh: hooks actualizan state correctamente después de crear/eliminar (sin guard `if(rows.length)`)
 
 ### Frontend — UI
-- [x] Login page con autenticación mock (`operador` / `CELERON2026`)
+- [x] Login page con credenciales `admin@gmail.com` / `12345678`, inputs editables
 - [x] Sidebar izquierdo con navegación e iconos SVG
-- [x] Layout con grid, header con reloj y estado del sistema
-- [x] Dashboard — KPIs + gráficos Bar/Doughnut + alertas recientes + Observer banner
+- [x] Layout con grid, header con reloj, estado del sistema y campana de notificaciones
+- [x] Dashboard — KPIs + gráficos Bar/Doughnut + alertas recientes
 - [x] Surtidores — CRUD: crear (Factory), editar estado, eliminar con confirmación
-- [x] Ventas — CRUD: registrar venta con cálculo binario en vivo, eliminar
-- [x] Alertas — CRUD: crear alerta, eliminar con confirmación + Observer en tiempo real
+- [x] Ventas — CRUD: registrar venta con cálculo binario, eliminar, búsqueda/filtro, gráfica por hora
+- [x] Alertas — CRUD: crear alerta, eliminar, tarjetas agrupadas por categoría (Crítica/Advertencia/Info)
 - [x] Reportes — Decoders integrados con toggle binario + tabla completa
+- [x] Campana de notificaciones (`NotificationBell.tsx`) — badge con conteo, dropdown con alertas nuevas
+- [x] Toast notifications centrados arriba (exito/error/info)
 - [x] Componentes UI reutilizables: `Modal.tsx`, `Toast.tsx`, `ConfirmDialog.tsx`
 - [x] Tema oscuro global (Plus Jakarta Sans, colores personalizados, scrollbar)
 - [x] Animación `slide-in` para notificaciones Toast
@@ -73,7 +76,7 @@ Seguimiento del avance del proyecto. Última actualización: 2026-07-23
 ### Patrones de diseño
 - [x] **Factory** (`patterns/factory/SurtidorFactory.ts`) — crear surtidores con tipos: estacionario, portátil, industrial
 - [x] **Adapter** (`patterns/adapter/DatabaseAdapter.ts` + `SupabaseAdapter.ts`) — interfaz abstracta de BD intercambiable, CRUD completo via HTTP fetch
-- [x] **Observer** (`patterns/observer/AlertObserver.ts`) — `AlertSubject` con suscripción y notificación de alertas
+- [x] **Observer** (`patterns/observer/AlertObserver.ts`) — `AlertSubject` con suscripción, `suscribirNuevos()` para notificaciones post-login, control de carga inicial
 
 ### Funcionalidad avanzada
 - [x] **Aritmética binaria** (`utils/binaryMath.ts`) — `decimalABinario()`, `binarioADecimal()`, `sumarBinarios()`, `restarBinarios()`, `multiplicarBinarios()`
@@ -114,6 +117,12 @@ Seguimiento del avance del proyecto. Última actualización: 2026-07-23
 
 | Hash | Descripción |
 |------|-------------|
+| `6ecb686` | fix(frontend): remove if(rows.length) guards in hooks to fix auto-refresh after mutations |
+| `38d99eb` | feat(frontend): add notification bell and restructure alert system with category cards |
+| `b171628` | feat(frontend): update login with editable inputs and new credentials |
+| `af24f67` | fix(frontend): fix Ventas chart hour parsing and center toast notifications |
+| `3f931fa` | refactor: eliminar datos mock, usar solo datos reales de Supabase |
+| `b387791` | refactor: convertir backend a Express API REST real con separación backend/frontend |
 | `02ef6a3` | feat: implementar MVC completo, patrones de diseño, CRUD y aritmética binaria |
 | `b6de969` | feat(frontend): auto-seed Supabase on app startup if empty |
 | `5fd60a5` | feat(backend): add seed function to populate Supabase with initial data |
