@@ -34,21 +34,33 @@ ProyectoFinal-PrograIV/
 │   │   ├── index.ts            # Servidor Express con rutas REST
 │   │   ├── package.json
 │   │   └── .env
-│   └── frontend/               # React + Vite
+│   └── frontend/               # React + Vite + TypeScript
+│       ├── public/
+│       │   └── favicon.svg     # Icono minimalista bomba de gasolina
 │       └── src/
 │           ├── models/         # Modelos de datos (MVC)
 │           ├── views/          # Pantallas principales (MVC)
 │           ├── controllers/    # Custom hooks con CRUD (MVC)
 │           ├── components/     # Componentes reutilizables
+│           │   ├── ThemeToggle.tsx   # Toggle modo oscuro/claro
+│           │   ├── NotificationBell.tsx
+│           │   ├── Login.tsx
+│           │   ├── Toast.tsx
+│           │   └── ...
 │           ├── patterns/       # Patrones de diseño
-│           ├── services/       # Adapter Context
+│           ├── services/       # Adapter Context + ThemeContext
 │           ├── utils/          # Aritmética binaria, decoders, helpers
+│           ├── index.css       # Tema oscuro + modo claro
 │           └── App.tsx
 ├── docs/
 │   ├── BD.md
-│   └── estructura.md
+│   ├── estructura.md
+│   └── deploy-railway.md      # Guía de deploy y errores solucionados
 ├── desarrollo/
 │   └── avance.md
+├── Dockerfile                  # Build para Railway (Node.js 22 + pnpm v9)
+├── .dockerignore
+├── railway.toml                # Configuración de Railway
 ├── README.md
 └── .gitignore
 ```
@@ -89,6 +101,7 @@ pnpm dev
 |---------|-------------|
 | `pnpm dev` | Arranca backend (puerto 3001) + frontend (puerto 5173) |
 | `pnpm build` | Build de producción del frontend |
+| `pnpm start` | Inicia backend en producción |
 | `pnpm run install:all` | Instala dependencias de backend y frontend |
 
 ### Variables de entorno
@@ -102,6 +115,26 @@ PORT=3001
 ```
 
 Obtener estos valores desde el panel de Supabase > **Settings > API**.
+
+## Funcionalidades
+
+- **Login** con credenciales y tarjeta de referencia
+- **Dashboard** con KPIs, gráficos Bar/Doughnut y alertas recientes
+- **Surtidores** CRUD con Factory pattern
+- **Ventas** CRUD con aritmética binaria y búsqueda/filtro
+- **Alertas** CRUD con Observer pattern y tarjetas por categoría
+- **Reportes** con decoders binarios
+- **Modo oscuro/claro** con toggle en el header
+- **Notificaciones** con campana y badge
+- **Toast notifications** centrados
+
+## Patrones de diseño
+
+| Patrón | Archivo | Uso |
+|--------|---------|-----|
+| Factory | `patterns/factory/SurtidorFactory.ts` | Crear surtidores con tipos |
+| Adapter | `patterns/adapter/SupabaseAdapter.ts` | Interfaz abstracta de BD |
+| Observer | `patterns/observer/AlertObserver.ts` | Notificaciones en tiempo real |
 
 ## API REST
 
@@ -122,3 +155,9 @@ El backend expone una API REST en `http://localhost:3001`:
 | `GET` | `/api/alertas` | Listar alertas |
 | `POST` | `/api/alertas` | Crear alerta (Observer) |
 | `DELETE` | `/api/alertas/:id` | Eliminar alerta |
+
+## Deploy
+
+Ver guía completa en [`docs/deploy-railway.md`](docs/deploy-railway.md)
+
+La aplicación está desplegada en Railway con Dockerfile (Node.js 22 + pnpm v9). El backend sirve los archivos estáticos del frontend en producción.
