@@ -26,7 +26,11 @@ Seguimiento del avance del proyecto. Última actualización: 2026-07-23
 - [x] Models tipados: `Surtidor.ts`, `Venta.ts`, `Alerta.ts` (con interfaces)
 - [x] Models reestructurados para multi-combustible por surtidor
 - [x] Services: `mockData.ts` con constante `COMBUSTIBLES` y datos extendidos
-- [x] Controllers/ (carpeta creada, pendiente implementar)
+
+### Frontend — Controllers
+- [x] Custom hooks: `useCombustibles`, `useSurtidores`, `useVentas`, `useAlertas`
+- [x] Utilidad `formatDate.ts` para formateo de timestamps
+- [x] Cada hook carga datos desde Supabase con fallback a mockData
 
 ### Frontend — UI
 - [x] Login page con autenticación mock
@@ -70,11 +74,12 @@ Seguimiento del avance del proyecto. Última actualización: 2026-07-23
 - [ ] Implementar Adapter pattern para abstraer la BD
 
 ### Funcionalidad
-- [ ] Conectar vistas con Supabase (reemplazar mock data)
+- [x] Vistas conectadas a Supabase a través de custom hooks
+- [x] Fallback automático a mockData si Supabase no está disponible o sin datos
+- [x] Tablas, gráficos y filtros funcionan con datos reales desde Supabase
 - [ ] Sistema de ventas con aritmética binaria
 - [ ] Decodificadores para reportes
 - [ ] Generación de reportes avanzada
-- [ ] Controllers (custom hooks) para cada entidad
 
 ### Patrones de diseño
 - [ ] Factory pattern en `patterns/factory/`
@@ -94,6 +99,9 @@ Seguimiento del avance del proyecto. Última actualización: 2026-07-23
 
 | Hash | Descripción |
 |------|-------------|
+| `aa3b3a7` | feat(frontend): integrate all views with Supabase via custom hooks |
+| `e3162f7` | feat(frontend): call verificarConexion on app startup |
+| `2eadff5` | chore(frontend): add vite env types for TypeScript |
 | `a180321` | feat(backend): add supabase client with connection verification |
 | `fa22cab` | feat(backend): create SQL migration for multi-combustible schema |
 | `8fa8641` | feat(frontend): redesign all views with charts, stats cards, and modern dark UI |
