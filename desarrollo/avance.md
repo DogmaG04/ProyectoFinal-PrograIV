@@ -44,6 +44,12 @@ Seguimiento del avance del proyecto. Última actualización: 2026-07-23
 - [x] Esquema con 5 tablas: combustibles, surtidores, surtidos, ventas, alertas
 - [x] Datos iniciales (combustibles ANH 2026, surtidores, surtidos)
 
+### Backend — Conexión
+- [x] Cliente Supabase en `services/supabase.ts`
+- [x] Función `verificarConexion()` con try/catch y mensajes en consola
+- [x] Variables de entorno en `.env.example`
+- [x] Dependencia `@supabase/supabase-js`
+
 ### Prototipo
 - [x] Prototipo visual en repo separado (GitHub Pages)
 - [x] Link del prototipo en README
@@ -58,7 +64,6 @@ Seguimiento del avance del proyecto. Última actualización: 2026-07-23
 ## Lo que falta por implementar
 
 ### Backend (Supabase)
-- [ ] Configurar conexión Supabase en `services/supabase.ts`
 - [ ] Implementar CRUD para surtidores
 - [ ] Implementar CRUD para ventas
 - [ ] Implementar CRUD para alertas
@@ -89,6 +94,7 @@ Seguimiento del avance del proyecto. Última actualización: 2026-07-23
 
 | Hash | Descripción |
 |------|-------------|
+| `a180321` | feat(backend): add supabase client with connection verification |
 | `fa22cab` | feat(backend): create SQL migration for multi-combustible schema |
 | `8fa8641` | feat(frontend): redesign all views with charts, stats cards, and modern dark UI |
 | `c5f2714` | feat(frontend): update app shell with new sidebar, header, and dark theme |
