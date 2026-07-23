@@ -1,64 +1,32 @@
-import { useState, useEffect, useRef } from 'react'
+import { useState } from 'react'
+import { showToast } from './Toast'
 
 interface LoginProps {
   onLogin: () => void
 }
 
+const EMAIL = 'admin@gmail.com'
+const PASS = '12345678'
+
 export default function Login({ onLogin }: LoginProps) {
-  const [typing, setTyping] = useState(true)
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
   const [hidden, setHidden] = useState(false)
   const [logginIn, setLogginIn] = useState(false)
-  const userRef = useRef<HTMLInputElement>(null)
-  const passRef = useRef<HTMLInputElement>(null)
-
-  const USER = 'operador'
-  const PASS = 'CELERON2026'
-
-  useEffect(() => {
-    let cancelled = false
-
-    function typeText(
-      el: HTMLInputElement,
-      text: string,
-      i: number,
-      cb: () => void
-    ) {
-      if (cancelled) return
-      if (i < text.length) {
-        el.value += text[i]
-        setTimeout(
-          () => typeText(el, text, i + 1, cb),
-          60 + Math.random() * 40
-        )
-      } else {
-        cb()
-      }
-    }
-
-    if (userRef.current && passRef.current) {
-      typeText(userRef.current, USER, 0, () => {
-        if (cancelled) return
-        setTimeout(() => {
-          if (cancelled) return
-          typeText(passRef.current!, PASS, 0, () => {
-            if (cancelled) return
-            setTyping(false)
-          })
-        }, 300)
-      })
-    }
-
-    return () => { cancelled = true }
-  }, [])
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
-    if (typing || logginIn) return
-    setLogginIn(true)
-    setTimeout(() => {
-      setHidden(true)
-      setTimeout(() => onLogin(), 500)
-    }, 600)
+    if (logginIn) return
+
+    if (email === EMAIL && password === PASS) {
+      setLogginIn(true)
+      setTimeout(() => {
+        setHidden(true)
+        setTimeout(() => onLogin(), 500)
+      }, 600)
+    } else {
+      showToast('error', 'Credenciales incorrectas')
+    }
   }
 
   return (
@@ -78,31 +46,34 @@ export default function Login({ onLogin }: LoginProps) {
 
         <form onSubmit={handleSubmit} className="flex flex-col gap-4 text-left">
           <div className="flex flex-col gap-1.5">
-            <label className="text-xs font-semibold text-subtext">Usuario</label>
+            <label className="text-xs font-semibold text-subtext">Email</label>
             <input
-              ref={userRef}
-              type="text"
-              readOnly
-              className="w-full px-4 py-3 border border-border rounded-xl bg-bg text-text text-sm outline-none"
+              type="email"
+              value={email}
+              onChange={e => setEmail(e.target.value)}
+              placeholder="admin@gmail.com"
+              autoFocus
+              className="w-full px-4 py-3 border border-border rounded-xl bg-bg text-text text-sm outline-none focus:border-primary transition-colors"
             />
           </div>
           <div className="flex flex-col gap-1.5">
             <label className="text-xs font-semibold text-subtext">Contraseña</label>
             <input
-              ref={passRef}
               type="password"
-              readOnly
-              className="w-full px-4 py-3 border border-border rounded-xl bg-bg text-text text-sm outline-none"
+              value={password}
+              onChange={e => setPassword(e.target.value)}
+              placeholder="••••••••"
+              className="w-full px-4 py-3 border border-border rounded-xl bg-bg text-text text-sm outline-none focus:border-primary transition-colors"
             />
           </div>
           <button
             type="submit"
-            disabled={typing}
+            disabled={logginIn || !email || !password}
             className="w-full py-3.5 bg-primary text-white rounded-xl font-semibold text-sm mt-2 transition-opacity hover:opacity-90 disabled:opacity-50 disabled:cursor-default"
           >
             {logginIn ? 'Ingresando...' : 'Iniciar Sesión'}
           </button>
-          <p className="text-center text-[11px] text-tertiary mt-1">Acceso demo — credenciales pre-cargadas</p>
+          <p className="text-center text-[11px] text-tertiary mt-1">Credenciales: admin@gmail.com / 12345678</p>
         </form>
       </div>
     </div>
