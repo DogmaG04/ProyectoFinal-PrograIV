@@ -20,21 +20,24 @@ Seguimiento del avance del proyecto. Última actualización: 2026-07-23
 - [x] React Router configurado con rutas
 - [x] TypeScript configurado (`tsconfig.json`)
 - [x] Dependencias: `react-router-dom`, `tailwindcss`, `@tailwindcss/vite`
+- [x] Dependencias: `chart.js`, `react-chartjs-2` (gráficos)
 
 ### Frontend — Estructura MVC
 - [x] Models tipados: `Surtidor.ts`, `Venta.ts`, `Alerta.ts` (con interfaces)
-- [x] Services: `mockData.ts` con datos de prueba
+- [x] Models reestructurados para multi-combustible por surtidor
+- [x] Services: `mockData.ts` con constante `COMBUSTIBLES` y datos extendidos
 - [x] Controllers/ (carpeta creada, pendiente implementar)
 
 ### Frontend — UI
-- [x] Sidebar izquierdo con navegación (estilo terminal)
-- [x] Layout con `<Outlet />` para rutas
-- [x] Dashboard — KPI cards + estado surtidores + alertas
-- [x] Surtidores — Cards con gauge bars de nivel
-- [x] Ventas — Tabla de ventas + KPIs
-- [x] Alertas — Panel con bordes de color por tipo
-- [x] Reportes — Tablas de resumen por combustible y surtidor
-- [x] Tema oscuro global (colores, JetBrains Mono, scrollbar)
+- [x] Login page con autenticación mock
+- [x] Sidebar izquierdo con navegación e iconos SVG
+- [x] Layout con grid, header con reloj y estado del sistema
+- [x] Dashboard — KPIs + gráficos Bar/Doughnut (Chart.js) + alertas recientes
+- [x] Surtidores — Cards con gauges multi-combustible y estados (activo/mantenimiento/fuera de servicio)
+- [x] Ventas — KPIs + gráfico Line de ventas por hora + tabla con totales
+- [x] Alertas — Filtros por tipo (crítica/advertencia/info) con badges de color
+- [x] Reportes — Cards por combustible y surtidor + charts Bar horizontales
+- [x] Tema oscuro global (Plus Jakarta Sans, colores personalizados, scrollbar)
 
 ### Prototipo
 - [x] Prototipo visual en repo separado (GitHub Pages)
@@ -82,6 +85,13 @@ Seguimiento del avance del proyecto. Última actualización: 2026-07-23
 
 | Hash | Descripción |
 |------|-------------|
+| `8fa8641` | feat(frontend): redesign all views with charts, stats cards, and modern dark UI |
+| `c5f2714` | feat(frontend): update app shell with new sidebar, header, and dark theme |
+| `e315a21` | feat(frontend): add login page component |
+| `8762f21` | feat(frontend): enrich mock data with COMBUSTIBLES constant and extended records |
+| `85192b2` | refactor(frontend): restructure models with new field schemas for surtidor multi-combustible |
+| `517938c` | chore(frontend): add chart.js and react-chartjs-2 dependencies |
+| `3ca2da0` | docs: add development tracking file |
 | `33e1ed4` | chore(frontend): remove old JSX files |
 | `25e2d57` | refactor(frontend): rename all JSX to TSX files |
 | `761ca08` | refactor(frontend): migrate mock data service to TypeScript |
