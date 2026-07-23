@@ -15,12 +15,20 @@ import { ThemeProvider } from './services/ThemeContext'
 const adapter = new SupabaseAdapter()
 
 export default function App() {
-  const [loggedIn, setLoggedIn] = useState(false)
+  const [loggedIn, setLoggedIn] = useState(() => localStorage.getItem('loggedIn') === 'true')
 
-  const handleLogout = useCallback(() => setLoggedIn(false), [])
+  const handleLogout = useCallback(() => {
+    localStorage.removeItem('loggedIn')
+    setLoggedIn(false)
+  }, [])
+
+  const handleLogin = useCallback(() => {
+    localStorage.setItem('loggedIn', 'true')
+    setLoggedIn(true)
+  }, [])
 
   if (!loggedIn) {
-    return <Login onLogin={() => setLoggedIn(true)} />
+    return <Login onLogin={handleLogin} />
   }
 
   return (
