@@ -10,9 +10,7 @@ export function useSurtidores(adapter: DatabaseAdapter | null = null) {
   const cargar = useCallback(() => {
     if (!adapter) { setLoading(false); return }
     adapter.obtenerSurtidores().then(rows => {
-      if (rows.length) {
-        setData(rows.map(r => new Surtidor(r)))
-      }
+      setData(rows.map(r => new Surtidor(r)))
       setLoading(false)
     }).catch(err => {
       setError(err.message)

@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useRef } from 'react'
 import { Alerta } from '../models/Alerta'
 import { DatabaseAdapter } from '../patterns/adapter/DatabaseAdapter'
 import { alertSubject } from '../patterns/observer/AlertObserver'
@@ -7,14 +7,17 @@ export function useAlertas(adapter: DatabaseAdapter | null = null) {
   const [data, setData] = useState<Alerta[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const primeraCarga = useRef(true)
 
   const cargar = useCallback(() => {
     if (!adapter) { setLoading(false); return }
     adapter.obtenerAlertas().then(rows => {
-      if (rows.length) {
-        const alertas = rows.map(r => new Alerta(r))
-        setData(alertas)
-        alertSubject.notificarMuchas(rows)
+      const alertas = rows.map(r => new Alerta(r))
+      setData(alertas)
+      alertSubject.notificarMuchas(rows)
+      if (primeraCarga.current) {
+        primeraCarga.current = false
+        alertSubject.marcarCargaInicialCompletada()
       }
       setLoading(false)
     }).catch(err => {

@@ -9,9 +9,7 @@ export function useCombustibles(adapter: DatabaseAdapter | null = null) {
   useEffect(() => {
     if (!adapter) { setLoading(false); return }
     adapter.obtenerCombustibles().then(rows => {
-      if (rows.length) {
-        setData(rows.map(r => ({ id: r.id, nombre: r.nombre, color: r.color, precioLitro: r.precioLitro })))
-      }
+      setData(rows.map(r => ({ id: r.id, nombre: r.nombre, color: r.color, precioLitro: r.precioLitro })))
       setLoading(false)
     })
   }, [adapter])
