@@ -20,9 +20,9 @@ export default function Dashboard() {
 
   const [slideIdx, setSlideIdx] = useState(0)
   const [paginaSurt, setPaginaSurt] = useState(1)
-  const [paginaAlertas, setPaginaAlertas] = useState(1)
+  const [slideAlertas, setSlideAlertas] = useState(0)
   const surtPorPagina = 4
-  const alertasPorPagina = 5
+  const alertasPorSlide = 3
   const slidesPorVista = 2
   const totalSlides = Math.ceil(surtidores.length / slidesPorVista)
   const parActual = surtidores.slice(slideIdx * slidesPorVista, slideIdx * slidesPorVista + slidesPorVista)
@@ -46,8 +46,8 @@ export default function Dashboard() {
   const alertasOrdenadas = [...alertas].sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime())
   const totalPaginasSurt = Math.ceil(surtidores.length / surtPorPagina)
   const surtPagina = surtidores.slice((paginaSurt - 1) * surtPorPagina, paginaSurt * surtPorPagina)
-  const totalPaginasAlertas = Math.ceil(alertasOrdenadas.length / alertasPorPagina)
-  const alertasPagina = alertasOrdenadas.slice((paginaAlertas - 1) * alertasPorPagina, paginaAlertas * alertasPorPagina)
+  const totalSlidesAlertas = Math.ceil(alertasOrdenadas.length / alertasPorSlide)
+  const alertasSlide = alertasOrdenadas.slice(slideAlertas * alertasPorSlide, slideAlertas * alertasPorSlide + alertasPorSlide)
 
   return (
     <div>
@@ -191,10 +191,14 @@ export default function Dashboard() {
         <div className="bg-surface border border-border rounded-2xl overflow-hidden">
           <div className="px-5 py-3.5 border-b border-border flex items-center justify-between">
             <span className="text-base font-bold text-text">Alertas Recientes</span>
-            <span className="text-xs text-tertiary bg-surface-hover px-2.5 py-1 rounded-full">{alertas.length} total</span>
+            {totalSlidesAlertas > 0 && (
+              <span className="text-xs text-tertiary bg-surface-hover px-2.5 py-1 rounded-full">
+                {slideAlertas + 1} / {totalSlidesAlertas}
+              </span>
+            )}
           </div>
-          <div className="p-3 flex flex-col gap-2.5">
-            {alertasPagina.map(a => (
+          <div className="p-3 flex flex-col gap-2.5 min-h-[120px]">
+            {alertasSlide.length > 0 ? alertasSlide.map(a => (
               <div key={a.id} className={`bg-surface border border-border border-l-4 ${a.tipo === 'critica' ? 'border-l-danger' : a.tipo === 'advertencia' ? 'border-l-warning' : 'border-l-primary'} rounded-2xl p-4 flex items-start justify-between gap-4 hover:bg-surface-hover transition-colors`}>
                 <div className="flex flex-col gap-1.5 flex-1">
                   <span className="text-sm font-medium text-text">{a.mensaje}</span>
@@ -207,15 +211,35 @@ export default function Dashboard() {
                   {a.tipo}
                 </span>
               </div>
-            ))}
+            )) : (
+              <span className="text-xs text-tertiary italic text-center py-4">No hay alertas</span>
+            )}
           </div>
-          <Pagination
-            paginaActual={paginaAlertas}
-            totalPaginas={totalPaginasAlertas}
-            totalItems={alertasOrdenadas.length}
-            itemsPorPagina={alertasPorPagina}
-            onCambioPagina={setPaginaAlertas}
-          />
+          {totalSlidesAlertas > 1 && (
+            <div className="px-5 pb-4 flex items-center justify-between">
+              <button
+                onClick={() => setSlideAlertas(i => (i - 1 + totalSlidesAlertas) % totalSlidesAlertas)}
+                className="w-8 h-8 rounded-full bg-surface-hover hover:bg-primary/20 text-subtext hover:text-primary flex items-center justify-center transition-colors text-lg font-bold cursor-pointer"
+              >
+                &#8249;
+              </button>
+              <div className="flex gap-1.5">
+                {Array.from({ length: totalSlidesAlertas }, (_, i) => (
+                  <button
+                    key={i}
+                    onClick={() => setSlideAlertas(i)}
+                    className={`h-2 rounded-full transition-all duration-300 cursor-pointer ${i === slideAlertas ? 'bg-primary w-5' : 'bg-surface-hover hover:bg-subtext w-2'}`}
+                  />
+                ))}
+              </div>
+              <button
+                onClick={() => setSlideAlertas(i => (i + 1) % totalSlidesAlertas)}
+                className="w-8 h-8 rounded-full bg-surface-hover hover:bg-primary/20 text-subtext hover:text-primary flex items-center justify-center transition-colors text-lg font-bold cursor-pointer"
+              >
+                &#8250;
+              </button>
+            </div>
+          )}
         </div>
       </div>
 
