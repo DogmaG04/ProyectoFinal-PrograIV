@@ -7,6 +7,7 @@ import Modal from '../components/Modal'
 import ConfirmDialog from '../components/ConfirmDialog'
 import { showToast } from '../components/Toast'
 import { fmtNum, statusTagClass, getNivelClass, getNivelColor } from '../utils/uiHelpers'
+import { surtidorSchema, editarSurtidorSchema } from '../schemas'
 
 export default function Surtidores() {
   const adapter = useAdapter()
@@ -22,9 +23,29 @@ export default function Surtidores() {
   const [ubicacion, setUbicacion] = useState('')
   const [editEstado, setEditEstado] = useState<'activo' | 'mantenimiento' | 'fuera de servicio'>('activo')
   const [guardando, setGuardando] = useState(false)
+  const [errores, setErrores] = useState<Record<string, string>>({})
+  const [touch, setTouch] = useState<Record<string, boolean>>({})
+
+  function validarCampo(campo: string, valor: string) {
+    const datos = { tipo, codigo, ubicacion, [campo]: valor }
+    const resultado = surtidorSchema.safeParse(datos)
+    if (!resultado.success) {
+      const errs = resultado.error.flatten().fieldErrors
+      const err = errs[campo as keyof typeof errs]
+      setErrores(prev => ({ ...prev, [campo]: err?.[0] || '' }))
+    } else {
+      setErrores(prev => ({ ...prev, [campo]: '' }))
+    }
+  }
 
   async function handleCrear() {
-    if (!codigo.trim() || !ubicacion.trim()) return
+    const resultado = surtidorSchema.safeParse({ tipo, codigo, ubicacion })
+    if (!resultado.success) {
+      const errs = resultado.error.flatten().fieldErrors
+      setErrores({ tipo: errs.tipo?.[0] || '', codigo: errs.codigo?.[0] || '', ubicacion: errs.ubicacion?.[0] || '' })
+      setTouch({ tipo: true, codigo: true, ubicacion: true })
+      return
+    }
     setGuardando(true)
     const config = SurtidorFactory.obtenerConfiguracion(tipo)
     const surtidos = config.combustibles.map(c => ({
@@ -39,6 +60,8 @@ export default function Surtidores() {
       setModalCrear(false)
       setCodigo('')
       setUbicacion('')
+      setErrores({})
+      setTouch({})
     } else {
       showToast('error', 'Error al crear surtidor')
     }
@@ -132,37 +155,48 @@ export default function Surtidores() {
         })}
       </div>
 
-      <Modal abierto={modalCrear} titulo="Nuevo Surtidor" onClose={() => setModalCrear(false)}>
+      <Modal abierto={modalCrear} titulo="Nuevo Surtidor" onClose={() => { setModalCrear(false); setErrores({}); setTouch({}) }}>
         <div className="flex flex-col gap-4">
           <div className="flex flex-col gap-1.5">
             <label className="text-xs font-semibold text-subtext">Tipo de Surtidor</label>
             <select
               value={tipo}
-              onChange={e => setTipo(e.target.value as TipoSurtidor)}
-              className="w-full px-4 py-3 border border-border rounded-xl bg-bg text-text text-sm outline-none"
+              onChange={e => { setTipo(e.target.value as TipoSurtidor); if (touch.tipo) validarCampo('tipo', e.target.value) }}
+              className={`w-full px-4 py-3 border rounded-xl bg-bg text-text text-sm outline-none ${
+                touch.tipo && errores.tipo ? 'border-danger' : 'border-border'
+              }`}
             >
               <option value="estacionario">Estacionario (3 combustibles, capacidad media)</option>
               <option value="portatil">Portátil (2 combustibles, capacidad baja)</option>
               <option value="industrial">Industrial (3 combustibles, capacidad alta)</option>
             </select>
+            {touch.tipo && errores.tipo && <p className="text-danger text-xs">{errores.tipo}</p>}
           </div>
           <div className="flex flex-col gap-1.5">
             <label className="text-xs font-semibold text-subtext">Código</label>
             <input
               value={codigo}
-              onChange={e => setCodigo(e.target.value)}
+              onChange={e => { setCodigo(e.target.value); if (touch.codigo) validarCampo('codigo', e.target.value) }}
+              onBlur={() => { setTouch(prev => ({ ...prev, codigo: true })); validarCampo('codigo', codigo) }}
               placeholder="Ej: S-007"
-              className="w-full px-4 py-3 border border-border rounded-xl bg-bg text-text text-sm outline-none"
+              className={`w-full px-4 py-3 border rounded-xl bg-bg text-text text-sm outline-none ${
+                touch.codigo && errores.codigo ? 'border-danger' : 'border-border'
+              }`}
             />
+            {touch.codigo && errores.codigo && <p className="text-danger text-xs">{errores.codigo}</p>}
           </div>
           <div className="flex flex-col gap-1.5">
             <label className="text-xs font-semibold text-subtext">Ubicación</label>
             <input
               value={ubicacion}
-              onChange={e => setUbicacion(e.target.value)}
+              onChange={e => { setUbicacion(e.target.value); if (touch.ubicacion) validarCampo('ubicacion', e.target.value) }}
+              onBlur={() => { setTouch(prev => ({ ...prev, ubicacion: true })); validarCampo('ubicacion', ubicacion) }}
               placeholder="Ej: Isla 4 — Lateral Norte"
-              className="w-full px-4 py-3 border border-border rounded-xl bg-bg text-text text-sm outline-none"
+              className={`w-full px-4 py-3 border rounded-xl bg-bg text-text text-sm outline-none ${
+                touch.ubicacion && errores.ubicacion ? 'border-danger' : 'border-border'
+              }`}
             />
+            {touch.ubicacion && errores.ubicacion && <p className="text-danger text-xs">{errores.ubicacion}</p>}
           </div>
           <div className="bg-surface-hover rounded-xl p-3 text-xs text-tertiary">
             <p className="font-semibold text-subtext mb-1">Surtidos que se crearán:</p>
@@ -177,7 +211,7 @@ export default function Surtidores() {
           </div>
           <button
             onClick={handleCrear}
-            disabled={guardando || !codigo.trim() || !ubicacion.trim()}
+            disabled={guardando}
             className="w-full py-3 bg-primary text-white rounded-xl font-semibold text-sm hover:opacity-90 disabled:opacity-50 transition-opacity"
           >
             {guardando ? 'Creando...' : 'Crear Surtidor'}
@@ -185,7 +219,7 @@ export default function Surtidores() {
         </div>
       </Modal>
 
-      <Modal abierto={modalEditar !== null} titulo="Editar Surtidor" onClose={() => setModalEditar(null)}>
+      <Modal abierto={modalEditar !== null} titulo="Editar Surtidor" onClose={() => { setModalEditar(null); setErrores({}); setTouch({}) }}>
         <div className="flex flex-col gap-4">
           <div className="flex flex-col gap-1.5">
             <label className="text-xs font-semibold text-subtext">Estado</label>

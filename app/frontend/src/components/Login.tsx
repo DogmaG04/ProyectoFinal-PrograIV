@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { showToast } from './Toast'
+import { loginSchema, type LoginFormData } from '../schemas'
 
 interface LoginProps {
   onLogin: () => void
@@ -13,15 +14,42 @@ export default function Login({ onLogin }: LoginProps) {
   const [password, setPassword] = useState('')
   const [hidden, setHidden] = useState(false)
   const [logginIn, setLogginIn] = useState(false)
+  const [errores, setErrores] = useState<Record<string, string>>({})
+  const [touch, setTouch] = useState<Record<string, boolean>>({})
 
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', 'dark')
     localStorage.setItem('theme', 'dark')
   }, [])
 
+  function validarCampo(campo: keyof LoginFormData, valor: string) {
+    const parcial = { [campo]: valor }
+    const resultado = loginSchema.safeParse({ email, password, ...parcial })
+    if (!resultado.success) {
+      const err = resultado.error.flatten().fieldErrors[campo]
+      setErrores(prev => ({ ...prev, [campo]: err?.[0] || '' }))
+    } else {
+      setErrores(prev => ({ ...prev, [campo]: '' }))
+    }
+  }
+
+  function handleBlur(campo: keyof LoginFormData) {
+    setTouch(prev => ({ ...prev, [campo]: true }))
+    const valor = campo === 'email' ? email : password
+    validarCampo(campo, valor)
+  }
+
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
     if (logginIn) return
+
+    const resultado = loginSchema.safeParse({ email, password })
+    if (!resultado.success) {
+      const errs = resultado.error.flatten().fieldErrors
+      setErrores({ email: errs.email?.[0] || '', password: errs.password?.[0] || '' })
+      setTouch({ email: true, password: true })
+      return
+    }
 
     if (email === EMAIL && password === PASS) {
       setLogginIn(true)
@@ -56,25 +84,37 @@ export default function Login({ onLogin }: LoginProps) {
               <input
                 type="email"
                 value={email}
-                onChange={e => setEmail(e.target.value)}
+                onChange={e => { setEmail(e.target.value); if (touch.email) validarCampo('email', e.target.value) }}
+                onBlur={() => handleBlur('email')}
                 placeholder="admin@gmail.com"
                 autoFocus
-                className="w-full px-4 py-3 border border-border rounded-xl bg-bg text-text text-sm outline-none focus:border-primary transition-colors"
+                className={`w-full px-4 py-3 border rounded-xl bg-bg text-text text-sm outline-none transition-colors ${
+                  touch.email && errores.email ? 'border-danger' : 'border-border focus:border-primary'
+                }`}
               />
+              {touch.email && errores.email && (
+                <p className="text-danger text-xs">{errores.email}</p>
+              )}
             </div>
             <div className="flex flex-col gap-1.5">
               <label className="text-xs font-semibold text-subtext">Contraseña</label>
               <input
                 type="password"
                 value={password}
-                onChange={e => setPassword(e.target.value)}
+                onChange={e => { setPassword(e.target.value); if (touch.password) validarCampo('password', e.target.value) }}
+                onBlur={() => handleBlur('password')}
                 placeholder="••••••••"
-                className="w-full px-4 py-3 border border-border rounded-xl bg-bg text-text text-sm outline-none focus:border-primary transition-colors"
+                className={`w-full px-4 py-3 border rounded-xl bg-bg text-text text-sm outline-none transition-colors ${
+                  touch.password && errores.password ? 'border-danger' : 'border-border focus:border-primary'
+                }`}
               />
+              {touch.password && errores.password && (
+                <p className="text-danger text-xs">{errores.password}</p>
+              )}
             </div>
             <button
               type="submit"
-              disabled={logginIn || !email || !password}
+              disabled={logginIn}
               className="w-full py-3.5 bg-primary text-white rounded-xl font-semibold text-sm mt-2 transition-opacity hover:opacity-90 disabled:opacity-50 disabled:cursor-default"
             >
               {logginIn ? 'Ingresando...' : 'Iniciar Sesión'}

@@ -5,6 +5,7 @@ import { useAdapter } from '../services/adapterContext'
 import Modal from '../components/Modal'
 import ConfirmDialog from '../components/ConfirmDialog'
 import { showToast } from '../components/Toast'
+import { alertaSchema } from '../schemas'
 
 const labels: Record<string, string> = { todas: 'Todas', critica: 'Crítica', advertencia: 'Advertencia', info: 'Info' }
 const tipos = ['todas', 'critica', 'advertencia', 'info'] as const
@@ -58,6 +59,8 @@ export default function Alertas() {
   const [tipo, setTipo] = useState<'critica' | 'advertencia' | 'info'>('info')
   const [selSurtidor, setSelSurtidor] = useState<number>(0)
   const [mensaje, setMensaje] = useState('')
+  const [errores, setErrores] = useState<Record<string, string>>({})
+  const [touch, setTouch] = useState<Record<string, boolean>>({})
 
   const counts: Record<string, number> = {}
   tipos.forEach(t => {
@@ -75,15 +78,33 @@ export default function Alertas() {
   if (filter === 'todas' || filter === 'advertencia') secciones.push({ tipo: 'advertencia', alertas: advertencias })
   if (filter === 'todas' || filter === 'info') secciones.push({ tipo: 'info', alertas: infos })
 
+  function validarAlerta() {
+    const resultado = alertaSchema.safeParse({ tipo, surtidorId: selSurtidor, mensaje })
+    if (!resultado.success) {
+      const errs = resultado.error.flatten().fieldErrors
+      setErrores({
+        tipo: errs.tipo?.[0] || '',
+        surtidorId: errs.surtidorId?.[0] || '',
+        mensaje: errs.mensaje?.[0] || '',
+      })
+      return false
+    }
+    setErrores({})
+    return true
+  }
+
   async function handleCrear() {
-    if (!selSurtidor || !mensaje.trim()) return
+    if (!validarAlerta()) return
     setGuardando(true)
     const ok = await crear(tipo, selSurtidor, mensaje.trim())
     setGuardando(false)
     if (ok) {
+      showToast('exito', 'Alerta creada correctamente')
       setModalNueva(false)
       setMensaje('')
       setSelSurtidor(0)
+      setErrores({})
+      setTouch({})
     } else {
       showToast('error', 'Error al crear alerta')
     }
@@ -180,46 +201,56 @@ export default function Alertas() {
         </div>
       )}
 
-      <Modal abierto={modalNueva} titulo="Nueva Alerta" onClose={() => setModalNueva(false)}>
+      <Modal abierto={modalNueva} titulo="Nueva Alerta" onClose={() => { setModalNueva(false); setErrores({}); setTouch({}) }}>
         <div className="flex flex-col gap-4">
           <div className="flex flex-col gap-1.5">
             <label className="text-xs font-semibold text-subtext">Tipo</label>
             <select
               value={tipo}
-              onChange={e => setTipo(e.target.value as typeof tipo)}
-              className="w-full px-4 py-3 border border-border rounded-xl bg-bg text-text text-sm outline-none"
+              onChange={e => { setTipo(e.target.value as typeof tipo); if (touch.tipo) setErrores(prev => ({ ...prev, tipo: '' })) }}
+              className={`w-full px-4 py-3 border rounded-xl bg-bg text-text text-sm outline-none ${
+                errores.tipo ? 'border-danger' : 'border-border'
+              }`}
             >
               <option value="critica">Crítica</option>
               <option value="advertencia">Advertencia</option>
               <option value="info">Info</option>
             </select>
+            {errores.tipo && <p className="text-danger text-xs">{errores.tipo}</p>}
           </div>
           <div className="flex flex-col gap-1.5">
             <label className="text-xs font-semibold text-subtext">Surtidor</label>
             <select
               value={selSurtidor}
-              onChange={e => setSelSurtidor(Number(e.target.value))}
-              className="w-full px-4 py-3 border border-border rounded-xl bg-bg text-text text-sm outline-none"
+              onChange={e => { setSelSurtidor(Number(e.target.value)); if (touch.surtidorId) setErrores(prev => ({ ...prev, surtidorId: '' })) }}
+              className={`w-full px-4 py-3 border rounded-xl bg-bg text-text text-sm outline-none ${
+                errores.surtidorId ? 'border-danger' : 'border-border'
+              }`}
             >
               <option value={0}>Seleccionar surtidor...</option>
               {surtidores.map(s => (
                 <option key={s.id} value={s.id}>{s.codigo} — {s.ubicacion}</option>
               ))}
             </select>
+            {errores.surtidorId && <p className="text-danger text-xs">{errores.surtidorId}</p>}
           </div>
           <div className="flex flex-col gap-1.5">
             <label className="text-xs font-semibold text-subtext">Mensaje</label>
             <textarea
               value={mensaje}
-              onChange={e => setMensaje(e.target.value)}
+              onChange={e => { setMensaje(e.target.value); if (touch.mensaje) setErrores(prev => ({ ...prev, mensaje: '' })) }}
+              onBlur={() => setTouch(prev => ({ ...prev, mensaje: true }))}
               placeholder="Descripción de la alerta..."
               rows={3}
-              className="w-full px-4 py-3 border border-border rounded-xl bg-bg text-text text-sm outline-none resize-none"
+              className={`w-full px-4 py-3 border rounded-xl bg-bg text-text text-sm outline-none resize-none ${
+                errores.mensaje ? 'border-danger' : 'border-border'
+              }`}
             />
+            {errores.mensaje && <p className="text-danger text-xs">{errores.mensaje}</p>}
           </div>
           <button
             onClick={handleCrear}
-            disabled={guardando || !selSurtidor || !mensaje.trim()}
+            disabled={guardando}
             className="w-full py-3 bg-primary text-white rounded-xl font-semibold text-sm hover:opacity-90 disabled:opacity-50 transition-opacity"
           >
             {guardando ? 'Creando...' : 'Crear Alerta'}

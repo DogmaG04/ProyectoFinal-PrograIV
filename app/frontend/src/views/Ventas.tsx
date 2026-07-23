@@ -10,6 +10,7 @@ import Modal from '../components/Modal'
 import ConfirmDialog from '../components/ConfirmDialog'
 import { showToast } from '../components/Toast'
 import { fmt, fmtNum } from '../utils/uiHelpers'
+import { ventaSchema } from '../schemas'
 
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend, Filler)
 
@@ -33,6 +34,8 @@ export default function Ventas() {
   const [selSurtidor, setSelSurtidor] = useState<number>(0)
   const [selCombustible, setSelCombustible] = useState<number>(0)
   const [litros, setLitros] = useState<string>('')
+  const [errores, setErrores] = useState<Record<string, string>>({})
+  const [touch, setTouch] = useState<Record<string, boolean>>({})
 
   const litrosNum = parseFloat(litros) || 0
   const precioUnitario = combustibles.find(c => c.id === selCombustible)?.precioLitro || 0
@@ -45,6 +48,21 @@ export default function Ventas() {
   function getCombColor(combustibleId: number) {
     const c = combustibles.find(x => x.id === combustibleId)
     return c ? c.color : '#6b7280'
+  }
+
+  function validarVenta() {
+    const resultado = ventaSchema.safeParse({ surtidorId: selSurtidor, combustibleId: selCombustible, litros: litrosNum })
+    if (!resultado.success) {
+      const errs = resultado.error.flatten().fieldErrors
+      setErrores({
+        surtidorId: errs.surtidorId?.[0] || '',
+        combustibleId: errs.combustibleId?.[0] || '',
+        litros: errs.litros?.[0] || '',
+      })
+      return false
+    }
+    setErrores({})
+    return true
   }
 
   const filtradas = useMemo(() => {
@@ -103,7 +121,7 @@ export default function Ventas() {
   const usaNumero = campoFiltro === 'litros' || campoFiltro === 'total'
 
   async function handleCrear() {
-    if (!selSurtidor || !selCombustible || litrosNum <= 0) return
+    if (!validarVenta()) return
     setGuardando(true)
     const ok = await crear(selSurtidor, selCombustible, litrosNum, total)
     setGuardando(false)
@@ -113,6 +131,8 @@ export default function Ventas() {
       setSelSurtidor(0)
       setSelCombustible(0)
       setLitros('')
+      setErrores({})
+      setTouch({})
     } else {
       showToast('error', 'Error al registrar venta')
     }
@@ -320,45 +340,55 @@ export default function Ventas() {
         </table>
       </div>
 
-      <Modal abierto={modalNueva} titulo="Registrar Venta" onClose={() => setModalNueva(false)}>
+      <Modal abierto={modalNueva} titulo="Registrar Venta" onClose={() => { setModalNueva(false); setErrores({}); setTouch({}) }}>
         <div className="flex flex-col gap-4">
           <div className="flex flex-col gap-1.5">
             <label className="text-xs font-semibold text-subtext">Surtidor</label>
             <select
               value={selSurtidor}
-              onChange={e => setSelSurtidor(Number(e.target.value))}
-              className="w-full px-4 py-3 border border-border rounded-xl bg-bg text-text text-sm outline-none"
+              onChange={e => { setSelSurtidor(Number(e.target.value)); if (touch.surtidorId) setErrores(prev => ({ ...prev, surtidorId: '' })) }}
+              className={`w-full px-4 py-3 border rounded-xl bg-bg text-text text-sm outline-none ${
+                errores.surtidorId ? 'border-danger' : 'border-border'
+              }`}
             >
               <option value={0}>Seleccionar surtidor...</option>
               {surtidoresActivos.map(s => (
                 <option key={s.id} value={s.id}>{s.codigo} — {s.ubicacion}</option>
               ))}
             </select>
+            {errores.surtidorId && <p className="text-danger text-xs">{errores.surtidorId}</p>}
           </div>
           <div className="flex flex-col gap-1.5">
             <label className="text-xs font-semibold text-subtext">Combustible</label>
             <select
               value={selCombustible}
-              onChange={e => setSelCombustible(Number(e.target.value))}
-              className="w-full px-4 py-3 border border-border rounded-xl bg-bg text-text text-sm outline-none"
+              onChange={e => { setSelCombustible(Number(e.target.value)); if (touch.combustibleId) setErrores(prev => ({ ...prev, combustibleId: '' })) }}
+              className={`w-full px-4 py-3 border rounded-xl bg-bg text-text text-sm outline-none ${
+                errores.combustibleId ? 'border-danger' : 'border-border'
+              }`}
             >
               <option value={0}>Seleccionar combustible...</option>
               {combustibles.map(c => (
                 <option key={c.id} value={c.id}>{c.nombre} — {fmt(c.precioLitro)}/L</option>
               ))}
             </select>
+            {errores.combustibleId && <p className="text-danger text-xs">{errores.combustibleId}</p>}
           </div>
           <div className="flex flex-col gap-1.5">
             <label className="text-xs font-semibold text-subtext">Litros</label>
             <input
               type="number"
               value={litros}
-              onChange={e => setLitros(e.target.value)}
+              onChange={e => { setLitros(e.target.value); if (touch.litros) setErrores(prev => ({ ...prev, litros: '' })) }}
+              onBlur={() => setTouch(prev => ({ ...prev, litros: true }))}
               placeholder="0.00"
               min="0"
               step="0.1"
-              className="w-full px-4 py-3 border border-border rounded-xl bg-bg text-text text-sm outline-none"
+              className={`w-full px-4 py-3 border rounded-xl bg-bg text-text text-sm outline-none ${
+                errores.litros ? 'border-danger' : 'border-border'
+              }`}
             />
+            {errores.litros && <p className="text-danger text-xs">{errores.litros}</p>}
           </div>
 
           {litrosNum > 0 && precioUnitario > 0 && (
@@ -400,7 +430,7 @@ export default function Ventas() {
 
           <button
             onClick={handleCrear}
-            disabled={guardando || !selSurtidor || !selCombustible || litrosNum <= 0}
+            disabled={guardando}
             className="w-full py-3 bg-primary text-white rounded-xl font-semibold text-sm hover:opacity-90 disabled:opacity-50 transition-opacity"
           >
             {guardando ? 'Registrando...' : 'Registrar Venta'}
