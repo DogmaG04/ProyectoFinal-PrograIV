@@ -159,44 +159,55 @@ export default function Ventas() {
             ))}
           </div>
 
+          <span className="text-xs text-tertiary">→ Seleccionar campo</span>
+
           {usaNumero && (
-            <div className="flex gap-1.5">
-              {(['mayor', 'menor', 'igual'] as OperadorFiltro[]).map(op => (
-                <button
-                  key={op}
-                  onClick={() => setOperador(op)}
-                  className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors ${
-                    operador === op
-                      ? 'bg-primary text-white'
-                      : 'bg-bg border border-border text-subtext hover:text-text hover:border-primary'
-                  }`}
-                >
-                  {op === 'mayor' ? '> ' : op === 'menor' ? '< ' : '= '}
-                </button>
-              ))}
-            </div>
+            <>
+              <div className="flex gap-1.5">
+                {(['mayor', 'menor', 'igual'] as OperadorFiltro[]).map(op => (
+                  <button
+                    key={op}
+                    onClick={() => setOperador(op)}
+                    className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors ${
+                      operador === op
+                        ? 'bg-primary text-white'
+                        : 'bg-bg border border-border text-subtext hover:text-text hover:border-primary'
+                    }`}
+                  >
+                    {op === 'mayor' ? '> ' : op === 'menor' ? '< ' : '= '}
+                  </button>
+                ))}
+              </div>
+              <span className="text-xs text-tertiary">→ Operador</span>
+            </>
           )}
 
           {(campoFiltro === 'surtidor' || campoFiltro === 'combustible') && !valorFiltro ? (
-            <div className="flex gap-1.5">
-              {(campoFiltro === 'surtidor' ? surtidoresUnicos : combustiblesUnicos).map(item => (
-                <button
-                  key={item}
-                  onClick={() => setValorFiltro(item)}
-                  className="px-3 py-1.5 rounded-lg text-xs font-semibold bg-bg border border-border text-subtext hover:text-text hover:border-primary transition-colors"
-                >
-                  {item}
-                </button>
-              ))}
-            </div>
+            <>
+              <div className="flex gap-1.5">
+                {(campoFiltro === 'surtidor' ? surtidoresUnicos : combustiblesUnicos).map(item => (
+                  <button
+                    key={item}
+                    onClick={() => setValorFiltro(item)}
+                    className="px-3 py-1.5 rounded-lg text-xs font-semibold bg-bg border border-border text-subtext hover:text-text hover:border-primary transition-colors"
+                  >
+                    {item}
+                  </button>
+                ))}
+              </div>
+              <span className="text-xs text-tertiary">→ Seleccionar valor</span>
+            </>
           ) : (
-            <input
-              type={usaNumero ? 'number' : 'text'}
-              value={valorFiltro}
-              onChange={e => setValorFiltro(e.target.value)}
-              placeholder={placeholderCampo[campoFiltro]}
-              className="px-3 py-1.5 border border-border rounded-lg bg-bg text-text text-xs outline-none w-48"
-            />
+            <>
+              <input
+                type={usaNumero ? 'number' : 'text'}
+                value={valorFiltro}
+                onChange={e => setValorFiltro(e.target.value)}
+                placeholder={placeholderCampo[campoFiltro]}
+                className="px-3 py-1.5 border border-border rounded-lg bg-bg text-text text-xs outline-none w-48"
+              />
+              <span className="text-xs text-tertiary">→ {usaNumero ? 'Ingrese un valor' : 'Escriba para buscar'}</span>
+            </>
           )}
 
           {valorFiltro && (
