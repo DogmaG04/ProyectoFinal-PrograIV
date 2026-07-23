@@ -1,166 +1,127 @@
 import {
-  obtenerCombustibles as beObtenerCombustibles,
-  obtenerSurtidores as beObtenerSurtidores,
-  crearSurtidor as beCrearSurtidor,
-  editarSurtidor as beEditarSurtidor,
-  eliminarSurtidor as beEliminarSurtidor,
-  eliminarVenta as beEliminarVenta,
-  eliminarAlerta as beEliminarAlerta,
-} from '../../backend'
-import { verificarConexion as beVerificarConexion } from '../../backend/services/supabaseClient'
-import { supabase } from '../../backend/services/supabaseClient'
-import { formatTimestamp } from '../../utils/formatDate'
-import {
   DatabaseAdapter,
   DBCombustible,
   DBSurtidor,
-  DBSurtido,
   DBVenta,
   DBAlerta,
 } from './DatabaseAdapter'
 
+const API = '/api'
+
+async function api<T>(path: string, init?: RequestInit): Promise<T> {
+  const res = await fetch(`${API}${path}`, {
+    headers: { 'Content-Type': 'application/json' },
+    ...init,
+  })
+  return res.json()
+}
+
 export class SupabaseAdapter implements DatabaseAdapter {
   async verificarConexion(): Promise<boolean> {
-    return beVerificarConexion()
+    const { connected } = await api<{ connected: boolean }>('/health')
+    return connected
   }
 
   async obtenerCombustibles(): Promise<DBCombustible[]> {
-    return beObtenerCombustibles()
+    return api<DBCombustible[]>('/combustibles')
   }
 
   async obtenerSurtidores(): Promise<DBSurtidor[]> {
-    const rows = await beObtenerSurtidores()
-    return rows.map(r => ({
-      id: r.id,
-      codigo: r.codigo,
-      ubicacion: r.ubicacion,
-      estado: r.estado,
-      surtidos: r.surtidos.map((s: any) => ({
-        id: s.id,
-        surtidorId: s.surtidorId,
-        combustibleId: s.combustibleId,
-        nivel: s.nivel,
-        capacidad: s.capacidad,
-      } as DBSurtido)),
-    }))
+    return api<DBSurtidor[]>('/surtidores')
   }
 
-  async crearSurtidor(codigo: string, ubicacion: string, estado: 'activo' | 'mantenimiento' | 'fuera de servicio', surtidos: { combustibleId: number; nivel: number; capacidad: number }[]): Promise<DBSurtidor | null> {
-    const result = await beCrearSurtidor(codigo, ubicacion, estado, surtidos)
-    if (!result) return null
-    return {
-      id: result.id,
-      codigo: result.codigo,
-      ubicacion: result.ubicacion,
-      estado: result.estado,
-      surtidos: result.surtidos.map((s: any) => ({
-        id: s.id,
-        surtidorId: s.surtidorId,
-        combustibleId: s.combustibleId,
-        nivel: s.nivel,
-        capacidad: s.capacidad,
-      } as DBSurtido)),
-    }
+  async crearSurtidor(
+    codigo: string,
+    ubicacion: string,
+    estado: 'activo' | 'mantenimiento' | 'fuera de servicio',
+    surtidos: { combustibleId: number; nivel: number; capacidad: number }[]
+  ): Promise<DBSurtidor | null> {
+    const data = await api<{ id: number } & Record<string, unknown>>('/surtidores', {
+      method: 'POST',
+      body: JSON.stringify({ codigo, ubicacion, estado, surtidos }),
+    })
+    if (!data?.id) return null
+    return { id: data.id, codigo, ubicacion, estado, surtidos: surtidos.map((s, i) => ({ id: i, surtidorId: data.id, ...s })) }
   }
 
   async editarSurtidor(id: number, cambios: Partial<{ ubicacion: string; estado: 'activo' | 'mantenimiento' | 'fuera de servicio' }>): Promise<boolean> {
-    return beEditarSurtidor(id, cambios)
+    const { ok } = await api<{ ok: boolean }>(`/surtidores/${id}`, {
+      method: 'PUT',
+      body: JSON.stringify(cambios),
+    })
+    return ok
   }
 
   async eliminarSurtidor(id: number): Promise<boolean> {
-    return beEliminarSurtidor(id)
+    const { ok } = await api<{ ok: boolean }>(`/surtidores/${id}`, { method: 'DELETE' })
+    return ok
   }
 
   async obtenerVentas(): Promise<DBVenta[]> {
-    const { data, error } = await supabase
-      .from('ventas')
-      .select('*, surtidores!inner(codigo), combustibles!inner(nombre)')
-
-    if (error || !data?.length) return []
-
-    return data.map((r: any) => ({
-      id: r.id,
-      fecha: formatTimestamp(r.fecha),
-      surtidor: r.surtidores?.codigo || '',
-      combustible: r.combustibles?.nombre || '',
-      litros: r.litros,
-      total: r.total,
-      surtidorId: r.surtidor_id,
-      combustibleId: r.combustible_id,
+    const rows = await api<Record<string, unknown>[]>('/ventas')
+    return rows.map(r => ({
+      id: r.id as number,
+      fecha: r.fecha as string,
+      surtidor: r.surtidor as string,
+      combustible: r.combustible as string,
+      litros: r.litros as number,
+      total: r.total as number,
+      surtidorId: r.surtidor_id as number,
+      combustibleId: r.combustible_id as number,
     }))
   }
 
   async crearVenta(surtidorId: number, combustibleId: number, litros: number, total: number): Promise<DBVenta | null> {
-    const { data, error } = await supabase
-      .from('ventas')
-      .insert({
-        fecha: new Date().toISOString(),
-        surtidor_id: surtidorId,
-        combustible_id: combustibleId,
-        litros,
-        total,
-      })
-      .select('*, surtidores!inner(codigo), combustibles!inner(nombre)')
-      .single()
-
-    if (error || !data) return null
-
+    const data = await api<Record<string, unknown> | null>('/ventas', {
+      method: 'POST',
+      body: JSON.stringify({ surtidorId, combustibleId, litros, total }),
+    })
+    if (!data?.id) return null
     return {
-      id: data.id,
-      fecha: formatTimestamp(data.fecha),
-      surtidor: data.surtidores?.codigo || '',
-      combustible: data.combustibles?.nombre || '',
-      litros: data.litros,
-      total: data.total,
-      surtidorId: data.surtidor_id,
-      combustibleId: data.combustible_id,
+      id: data.id as number,
+      fecha: data.fecha as string,
+      surtidor: '',
+      combustible: '',
+      litros: data.litros as number,
+      total: data.total as number,
+      surtidorId: data.surtidor_id as number,
+      combustibleId: data.combustible_id as number,
     }
   }
 
   async eliminarVenta(id: number): Promise<boolean> {
-    return beEliminarVenta(id)
+    const { ok } = await api<{ ok: boolean }>(`/ventas/${id}`, { method: 'DELETE' })
+    return ok
   }
 
   async obtenerAlertas(): Promise<DBAlerta[]> {
-    const { data, error } = await supabase
-      .from('alertas')
-      .select('*, surtidores!inner(codigo)')
-
-    if (error || !data?.length) return []
-
-    return data.map((r: any) => ({
-      id: r.id,
-      tipo: r.tipo,
-      surtidor: r.surtidores?.codigo || '',
-      mensaje: r.mensaje,
-      timestamp: formatTimestamp(r.timestamp),
+    const rows = await api<Record<string, unknown>[]>('/alertas')
+    return rows.map(r => ({
+      id: r.id as number,
+      tipo: r.tipo as 'critica' | 'advertencia' | 'info',
+      surtidor: r.surtidor as string,
+      mensaje: r.mensaje as string,
+      timestamp: r.timestamp as string,
     }))
   }
 
   async crearAlerta(tipo: 'critica' | 'advertencia' | 'info', surtidorId: number, mensaje: string): Promise<DBAlerta | null> {
-    const { data, error } = await supabase
-      .from('alertas')
-      .insert({
-        tipo,
-        surtidor_id: surtidorId,
-        mensaje,
-        timestamp: new Date().toISOString(),
-      })
-      .select('*, surtidores!inner(codigo)')
-      .single()
-
-    if (error || !data) return null
-
+    const data = await api<Record<string, unknown> | null>('/alertas', {
+      method: 'POST',
+      body: JSON.stringify({ tipo, surtidorId, mensaje }),
+    })
+    if (!data?.id) return null
     return {
-      id: data.id,
-      tipo: data.tipo,
-      surtidor: data.surtidores?.codigo || '',
-      mensaje: data.mensaje,
-      timestamp: formatTimestamp(data.timestamp),
+      id: data.id as number,
+      tipo: data.tipo as 'critica' | 'advertencia' | 'info',
+      surtidor: '',
+      mensaje: data.mensaje as string,
+      timestamp: data.timestamp as string,
     }
   }
 
   async eliminarAlerta(id: number): Promise<boolean> {
-    return beEliminarAlerta(id)
+    const { ok } = await api<{ ok: boolean }>(`/alertas/${id}`, { method: 'DELETE' })
+    return ok
   }
 }

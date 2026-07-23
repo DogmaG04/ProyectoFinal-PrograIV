@@ -2,6 +2,8 @@
 
 Proyecto backend alojado en [Supabase](https://supabase.com/) usando PostgreSQL.
 
+El backend Express conecta a Supabase usando `@supabase/supabase-js`. Las credenciales se encuentran en `app/backend/.env`.
+
 ---
 
 ## Tabla: `combustibles`
@@ -102,3 +104,9 @@ surtidores   (1) ──── (N) alertas
 - Un surtidor puede tener múltiples combustibles (a través de `surtidos`)
 - Cada venta pertenece a un surtidor y a un combustible
 - Cada alerta pertenece a un surtidor
+
+---
+
+## Migraciones
+
+Las migraciones SQL se encuentran en `app/backend/migrations/001_create_tables.sql`. El seed de datos iniciales se ejecuta automáticamente al iniciar el backend (si las tablas están vacías) a través del endpoint `POST /api/seed`.

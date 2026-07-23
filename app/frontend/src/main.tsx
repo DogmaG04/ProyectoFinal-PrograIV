@@ -2,10 +2,13 @@ import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import './index.css'
 import App from './App'
-import { verificarConexion } from './backend'
-import { sembrarDatos } from './backend'
 
-verificarConexion().then(ok => { if (ok) sembrarDatos() })
+fetch('/api/health')
+  .then(r => r.json())
+  .then(({ connected }) => {
+    if (connected) fetch('/api/seed', { method: 'POST' })
+  })
+  .catch(() => console.warn('Backend no disponible'))
 
 const root = document.getElementById('root')
 if (root) {

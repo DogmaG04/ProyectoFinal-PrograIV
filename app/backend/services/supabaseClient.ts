@@ -1,7 +1,15 @@
+import { config } from 'dotenv'
 import { createClient } from '@supabase/supabase-js'
 
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL
-const supabaseKey = import.meta.env.VITE_SUPABASE_ANON_KEY
+config()
+
+const supabaseUrl = process.env.SUPABASE_URL
+const supabaseKey = process.env.SUPABASE_ANON_KEY
+
+if (!supabaseUrl || !supabaseKey) {
+  console.error('❌ Variables SUPABASE_URL y SUPABASE_ANON_KEY son requeridas en .env')
+  process.exit(1)
+}
 
 export const supabase = createClient(supabaseUrl, supabaseKey)
 

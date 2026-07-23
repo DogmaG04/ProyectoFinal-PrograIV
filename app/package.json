@@ -1,0 +1,12 @@
+{
+  "name": "surtidor-gasolina",
+  "private": true,
+  "scripts": {
+    "dev": "concurrently --names BE,FE --prefix-colors cyan,yellow \"cd backend && pnpm dev\" \"cd frontend && pnpm dev\"",
+    "build": "cd frontend && pnpm build",
+    "install:all": "cd backend && pnpm install && cd ../frontend && pnpm install"
+  },
+  "devDependencies": {
+    "concurrently": "^9.1.2"
+  }
+}

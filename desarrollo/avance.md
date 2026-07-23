@@ -12,7 +12,33 @@ Seguimiento del avance del proyecto. Última actualización: 2026-07-23
 - [x] `.gitignore` configurado
 - [x] README.md con badges, descripción, link del prototipo e instalación
 - [x] Documentación en `docs/BD.md` (tablas: combustibles, surtidores, surtidos, ventas, alertas)
-- [x] Documentación en `docs/estructura.md` (arquitectura MVC)
+- [x] Documentación en `docs/estructura.md` (arquitectura MVC + API REST)
+
+### Backend — Express API REST
+- [x] `app/backend/package.json` — Express 4, cors, dotenv, @supabase/supabase-js, tsx (dev)
+- [x] `app/backend/tsconfig.json` — TypeScript configurado para Node.js
+- [x] `app/backend/.env` — Variables de entorno (SUPABASE_URL, SUPABASE_ANON_KEY, PORT)
+- [x] `app/backend/services/supabaseClient.ts` — Cliente Supabase con `process.env` + `verificarConexion()`
+- [x] `app/backend/models/` — Interfaces TypeScript: `Combustible`, `Surtidor`, `Surtido`, `Venta`, `Alerta`
+- [x] `app/backend/controllers/` — Controladores CRUD completos:
+  - `combustibleController.ts` — `obtenerCombustibles()`
+  - `surtidorController.ts` — `obtenerSurtidores()`, `crearSurtidor()`, `editarSurtidor()`, `eliminarSurtidor()`
+  - `ventaController.ts` — `obtenerVentas()`, `crearVenta()`, `eliminarVenta()`
+  - `alertaController.ts` — `obtenerAlertas()`, `crearAlerta()`, `eliminarAlerta()`
+  - `seedController.ts` — `sembrarDatos()` (inserta datos de prueba)
+- [x] `app/backend/index.ts` — Servidor Express con 14 rutas REST:
+  - `GET /api/health`, `POST /api/seed`
+  - `GET/POST/PUT/DELETE /api/surtidores`
+  - `GET/POST/DELETE /api/ventas`
+  - `GET/POST/DELETE /api/alertas`
+  - `GET /api/combustibles`
+- [x] Auto-seed ejecutado al iniciar el backend si las tablas están vacías
+- [x] CORS configurado para localhost:5173
+
+### Backend — Base de datos
+- [x] Migración SQL en `app/backend/migrations/001_create_tables.sql`
+- [x] Esquema con 5 tablas: combustibles, surtidores, surtidos, ventas, alertas
+- [x] Datos iniciales (combustibles ANH 2026, surtidores, surtidos)
 
 ### Frontend — Base
 - [x] React + Vite inicializado con pnpm
@@ -21,24 +47,7 @@ Seguimiento del avance del proyecto. Última actualización: 2026-07-23
 - [x] TypeScript configurado (`tsconfig.json`)
 - [x] Dependencias: `react-router-dom`, `tailwindcss`, `@tailwindcss/vite`
 - [x] Dependencias: `chart.js`, `react-chartjs-2` (gráficos)
-
-### Backend — Base de datos
-- [x] Migración SQL en `app/backend/migrations/001_create_tables.sql`
-- [x] Esquema con 5 tablas: combustibles, surtidores, surtidos, ventas, alertas
-- [x] Datos iniciales (combustibles ANH 2026, surtidores, surtidos)
-
-### Backend — MVC separado (dentro de frontend/src)
-- [x] `src/backend/models/` — Interfaces tipadas: `Combustible`, `Surtidor`, `Surtido`, `Venta`, `Alerta`, `TipoAlerta`
-- [x] `src/backend/services/supabaseClient.ts` — Cliente Supabase + `verificarConexion()`
-- [x] `src/backend/controllers/` — Controladores CRUD completos:
-  - `combustibleController.ts` — `obtenerCombustibles()`
-  - `surtidorController.ts` — `obtenerSurtidores()`, `crearSurtidor()`, `editarSurtidor()`, `eliminarSurtidor()`
-  - `ventaController.ts` — `obtenerVentas()`, `crearVenta()`, `eliminarVenta()`
-  - `alertaController.ts` — `obtenerAlertas()`, `crearAlerta()`, `eliminarAlerta()`
-  - `seedController.ts` — `sembrarDatos()` (inserta todos los datos de prueba)
-  - `index.ts` — Barrel export de todos los controllers
-- [x] `src/backend/index.ts` — Barrel export de models + controllers + services
-- [x] `app/backend/` — Carpeta original mantenida para SQL migrations y referencia
+- [x] Vite proxy configurado: `/api` → `http://localhost:3001`
 
 ### Frontend — MVC (models, views, controllers)
 - [x] Models tipados en `src/models/` — `Surtidor.ts`, `Venta.ts`, `Alerta.ts`
@@ -63,7 +72,7 @@ Seguimiento del avance del proyecto. Última actualización: 2026-07-23
 
 ### Patrones de diseño
 - [x] **Factory** (`patterns/factory/SurtidorFactory.ts`) — crear surtidores con tipos: estacionario, portátil, industrial
-- [x] **Adapter** (`patterns/adapter/DatabaseAdapter.ts` + `SupabaseAdapter.ts`) — interfaz abstracta de BD intercambiable, CRUD completo
+- [x] **Adapter** (`patterns/adapter/DatabaseAdapter.ts` + `SupabaseAdapter.ts`) — interfaz abstracta de BD intercambiable, CRUD completo via HTTP fetch
 - [x] **Observer** (`patterns/observer/AlertObserver.ts`) — `AlertSubject` con suscripción y notificación de alertas
 
 ### Funcionalidad avanzada
@@ -73,10 +82,14 @@ Seguimiento del avance del proyecto. Última actualización: 2026-07-23
 ### Calidad de código
 - [x] Funciones helper compartidas en `utils/uiHelpers.ts`
 - [x] Adapter Context para inyección de dependencias (`services/adapterContext.tsx`)
-- [x] Variables de entorno en `.env.example`
-- [x] TypeScript compila sin errores (`tsc --noEmit` limpio)
+- [x] Variables de entorno en `.env.example` (frontend + backend)
+- [x] TypeScript compila sin errores en backend y frontend (`tsc --noEmit` limpio)
 - [x] Build de producción exitoso (`vite build`)
 - [x] Lint limpio (solo Fast Refresh warnings no bloqueantes)
+
+### Root — Concurrently
+- [x] `app/package.json` — ejecuta backend + frontend con `pnpm dev`
+- [x] Script `install:all` para instalar dependencias de ambos servicios
 
 ### Prototipo
 - [x] Prototipo visual en repo separado (GitHub Pages)
@@ -101,6 +114,7 @@ Seguimiento del avance del proyecto. Última actualización: 2026-07-23
 
 | Hash | Descripción |
 |------|-------------|
+| `02ef6a3` | feat: implementar MVC completo, patrones de diseño, CRUD y aritmética binaria |
 | `b6de969` | feat(frontend): auto-seed Supabase on app startup if empty |
 | `5fd60a5` | feat(backend): add seed function to populate Supabase with initial data |
 | `aa3b3a7` | feat(frontend): integrate all views with Supabase via custom hooks |
