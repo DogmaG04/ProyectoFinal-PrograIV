@@ -1,11 +1,40 @@
-import { Outlet } from 'react-router-dom'
+import { useState, useEffect } from 'react'
+import { Outlet, useLocation } from 'react-router-dom'
 import Sidebar from './Sidebar'
 
+const titles: Record<string, string> = {
+  '/': 'Dashboard',
+  '/surtidores': 'Surtidores',
+  '/ventas': 'Ventas',
+  '/alertas': 'Alertas',
+  '/reportes': 'Reportes',
+}
+
 export default function Layout() {
+  const location = useLocation()
+  const [time, setTime] = useState(new Date())
+
+  useEffect(() => {
+    const id = setInterval(() => setTime(new Date()), 1000)
+    return () => clearInterval(id)
+  }, [])
+
+  const title = titles[location.pathname] || 'Dashboard'
+
   return (
-    <div className="flex min-h-screen bg-bg">
+    <div className="grid min-h-screen" style={{ gridTemplateColumns: '240px 1fr', gridTemplateRows: '64px 1fr', gridTemplateAreas: '"sidebar header" "sidebar main"' }}>
       <Sidebar />
-      <main className="ml-60 flex-1 p-6">
+      <header className="bg-surface border-b border-border flex items-center justify-between px-8" style={{ gridArea: 'header' }}>
+        <h1 className="text-text text-xl font-bold">{title}</h1>
+        <div className="flex items-center gap-5 text-sm text-subtext">
+          <div className="flex items-center gap-2">
+            <span className="w-2 h-2 rounded-full bg-success" />
+            <span>Sistema en línea</span>
+          </div>
+          <span>{time.toLocaleTimeString('es-BO', { hour12: false })}</span>
+        </div>
+      </header>
+      <main className="overflow-y-auto p-7" style={{ gridArea: 'main', scrollbarWidth: 'thin', scrollbarColor: '#2a2a36 transparent' }}>
         <Outlet />
       </main>
     </div>
