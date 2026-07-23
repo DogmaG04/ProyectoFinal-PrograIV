@@ -1,6 +1,6 @@
 [build]
 builder = "nixpacks"
-buildCommand = "cd app && pnpm install:all && pnpm build"
+buildCommand = "npm i -g pnpm && cd app && pnpm install:all && pnpm build"
 
 [deploy]
-startCommand = "cd app && pnpm start"
+startCommand = "npm i -g pnpm && cd app && pnpm start"
