@@ -5,7 +5,7 @@ import { useVentas } from '../controllers/useVentas'
 import { useAlertas } from '../controllers/useAlertas'
 import { useCombustibles } from '../controllers/useCombustibles'
 import { useAdapter } from '../services/adapterContext'
-import { fmt, fmtNum, statusTagClass, getNivelClass, getNivelColor } from '../utils/uiHelpers'
+import { fmt, fmtNum, statusTagClass } from '../utils/uiHelpers'
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, ArcElement, Title, Tooltip, Legend)
 
@@ -57,7 +57,7 @@ export default function Dashboard() {
         </div>
       </div>
 
-      <div className="grid grid-cols-2 gap-4 mb-6">
+      <div className="mb-6">
         <div className="bg-surface border border-border rounded-2xl overflow-hidden">
           <div className="px-5 py-3.5 border-b border-border">
             <span className="text-base font-bold text-text">Estado de Surtidores</span>
@@ -68,37 +68,46 @@ export default function Dashboard() {
                 <th className="text-left px-5 py-3.5 text-xs font-semibold text-subtext">Código</th>
                 <th className="text-left px-5 py-3.5 text-xs font-semibold text-subtext">Ubicación</th>
                 <th className="text-left px-5 py-3.5 text-xs font-semibold text-subtext">Estado</th>
-                <th className="text-left px-5 py-3.5 text-xs font-semibold text-subtext">Diésel Oil</th>
+                <th className="text-left px-5 py-3.5 text-xs font-semibold text-subtext">Niveles</th>
               </tr>
             </thead>
             <tbody>
-              {surtidores.map(s => {
-                const diesel = s.surtidos.find(x => x.combustibleId === 3)
-                const pct = diesel ? (diesel.nivel / diesel.capacidad) * 100 : 0
-                return (
-                  <tr key={s.id} className="border-b border-border hover:bg-surface-hover transition-colors">
-                    <td className="px-5 py-3 text-sm font-semibold text-text">{s.codigo}</td>
-                    <td className="px-5 py-3 text-sm text-subtext">{s.ubicacion}</td>
-                    <td className="px-5 py-3">
-                      <span className={`inline-flex items-center px-3 py-1 rounded-full text-[11px] font-semibold uppercase tracking-wide ${statusTagClass(s.estado)}`}>
-                        {s.estado}
-                      </span>
-                    </td>
-                    <td className="px-5 py-3">
-                      <div className="flex items-center gap-2.5">
-                        <div className="w-[100px] h-2.5 bg-surface-hover rounded-full overflow-hidden">
-                          <div className={`h-full rounded-full ${getNivelClass(pct)}`} style={{ width: `${pct}%`, background: getNivelColor(pct) }} />
-                        </div>
-                        <span className="text-xs text-subtext font-medium">{Math.round(pct)}%</span>
-                      </div>
-                    </td>
-                  </tr>
-                )
-              })}
+              {surtidores.map(s => (
+                <tr key={s.id} className="border-b border-border hover:bg-surface-hover transition-colors">
+                  <td className="px-5 py-3 text-sm font-semibold text-text">{s.codigo}</td>
+                  <td className="px-5 py-3 text-sm text-subtext">{s.ubicacion}</td>
+                  <td className="px-5 py-3">
+                    <span className={`inline-flex items-center px-3 py-1 rounded-full text-[11px] font-semibold uppercase tracking-wide ${statusTagClass(s.estado)}`}>
+                      {s.estado}
+                    </span>
+                  </td>
+                  <td className="px-5 py-3">
+                    <div className="flex flex-wrap gap-2.5">
+                      {s.surtidos.length > 0
+                        ? s.surtidos.map(st => {
+                            const c = combustibles.find(x => x.id === st.combustibleId)
+                            const pct = (st.nivel / st.capacidad) * 100
+                            return (
+                              <div key={st.combustibleId} className="flex items-center gap-1.5">
+                                <div className="w-[72px] h-2 rounded-full overflow-hidden bg-surface-hover">
+                                  <div className="h-full rounded-full" style={{ width: `${pct}%`, background: c?.color || '#6b7280' }} />
+                                </div>
+                                <span className="text-[11px] text-subtext whitespace-nowrap">{c?.nombre?.split(' ')[0] || '?'} {Math.round(pct)}%</span>
+                              </div>
+                            )
+                          })
+                        : <span className="text-xs text-tertiary italic">Sin datos</span>
+                      }
+                    </div>
+                  </td>
+                </tr>
+              ))}
             </tbody>
           </table>
         </div>
+      </div>
 
+      <div className="mb-6">
         <div className="bg-surface border border-border rounded-2xl">
           <div className="px-5 py-3.5 border-b border-border flex items-center justify-between">
             <span className="text-base font-bold text-text">Alertas Recientes</span>
