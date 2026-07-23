@@ -101,6 +101,10 @@ Seguimiento del avance del proyecto. Última actualización: 2026-07-23
 - [x] SPA fallback: `app.get('*', ...)` devuelve `index.html` para rutas de React Router
 - [x] CORS configurado dinámicamente (dev: localhost, prod: todos los orígenes)
 - [x] Variables de entorno: `SUPABASE_URL`, `SUPABASE_ANON_KEY`, `PORT`, `NODE_ENV`
+- [x] `Dockerfile` — Node.js 22 + pnpm v9, build frontend y sirve backend
+- [x] `.dockerignore` — excluye `node_modules`, `dist`, docs
+- [x] `railway.toml` — configura builder como Dockerfile
+- [x] Documentación completa de errores y soluciones en `docs/deploy-railway.md`
 
 ### Prototipo
 - [x] Prototipo visual en repo separado (GitHub Pages)
@@ -114,6 +118,8 @@ Seguimiento del avance del proyecto. Última actualización: 2026-07-23
 - [ ] Generación de reportes avanzada (exportación PDF/CSV)
 
 ### Calidad y deploy
+- [x] Deploy en Railway (Dockerfile con Node.js 22 + pnpm v9)
+- [x] Documentación de errores de deploy en `docs/deploy-railway.md`
 - [ ] Pruebas unitarias
 - [ ] Configurar SonarQube
 
@@ -123,6 +129,17 @@ Seguimiento del avance del proyecto. Última actualización: 2026-07-23
 
 | Hash | Descripción |
 |------|-------------|
+| `a0a3f27` | docs: add Railway deployment guide with errors and solutions |
+| `90fce75` | fix(deploy): remove startCommand to let Dockerfile CMD handle startup |
+| `80eb302` | fix(deploy): pin pnpm to v9 to avoid build scripts approval requirement |
+| `c98a84d` | fix(deploy): upgrade to Node.js 22 for pnpm 11 compatibility |
+| `b4ebb63` | fix(deploy): switch from nixpacks to Dockerfile for reliable Railway builds |
+| `3e931f9` | fix(deploy): define build phase in nixpacks.toml with corepack enable |
+| `49416ce` | fix(deploy): remove corepack from nix packages, it's bundled with nodejs_20 |
+| `1085f7b` | fix(deploy): add nixpacks.toml with Node.js 20 and corepack for pnpm support |
+| `e75256f` | fix(deploy): install pnpm globally before build and start |
+| `a7158e6` | fix(deploy): correct railway.toml format to use [deploy] section |
+| `9946957` | docs: add TypeScript, Node.js, Chart.js and Railway badges, update commit tracking |
 | `8b757ee` | feat(deploy): configure backend to serve frontend and prepare for Railway deployment |
 | `11288f7` | refactor: align backend/frontend field names and fix adapter mapping for JOIN queries |
 | `2d77192` | docs: update development tracking with latest features and commits |
