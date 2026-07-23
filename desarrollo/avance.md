@@ -73,6 +73,22 @@ Seguimiento del avance del proyecto. Última actualización: 2026-07-23
 - [x] Tema oscuro global (Plus Jakarta Sans, colores personalizados, scrollbar)
 - [x] Animación `slide-in` para notificaciones Toast
 
+### Frontend — UI (avance reciente)
+- [x] **Diseño responsive** — Layout con sidebar colapsable en mobile (hamburger menu), grids responsive, tablas con scroll horizontal
+- [x] **Splash screen** (`LoadingScreen.tsx`) — pantalla de carga al refrescar la página con animación de puntos
+- [x] **Persistencia de sesión** — Login state guardado en `localStorage`, resiste F5
+- [x] **Paginación reutilizable** (`Pagination.tsx`) — componente con flechas, números de página y puntos, aplicado a todas las vistas
+- [x] **Slider de surtidores en Dashboard** — barras de nivel de combustible por surtidor con navegación
+- [x] **Slider de alertas en Dashboard** — carrusel de alertas recientes ordenadas por fecha
+- [x] **Niveles dinámicos de combustible** — mini barras de progreso en Dashboard por cada surtidor
+
+### Frontend — Validación
+- [x] **Zod schemas** (`schemas/`) — `auth.ts`, `surtidor.ts`, `venta.ts`, `alerta.ts`, `index.ts`
+- [x] **Validación en Login** — email y contraseña con errores inline y bordes rojos
+- [x] **Validación en Surtidores** — crear con schema, touch-on-blur
+- [x] **Validación en Ventas** — seleccionar surtidor, combustible y litros
+- [x] **Validación en Alertas** — seleccionar tipo, surtidor y mensaje
+
 ### Patrones de diseño
 - [x] **Factory** (`patterns/factory/SurtidorFactory.ts`) — crear surtidores con tipos: estacionario, portátil, industrial
 - [x] **Adapter** (`patterns/adapter/DatabaseAdapter.ts` + `SupabaseAdapter.ts`) — interfaz abstracta de BD intercambiable, CRUD completo via HTTP fetch
@@ -117,9 +133,7 @@ Seguimiento del avance del proyecto. Última actualización: 2026-07-23
 ### Funcionalidad
 - [ ] Generación de reportes avanzada (exportación PDF/CSV)
 
-### Calidad y deploy
-- [x] Deploy en Railway (Dockerfile con Node.js 22 + pnpm v9)
-- [x] Documentación de errores de deploy en `docs/deploy-railway.md`
+### Calidad
 - [ ] Pruebas unitarias
 - [ ] Configurar SonarQube
 

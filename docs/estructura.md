@@ -22,21 +22,36 @@ ProyectoFinal-PrograIV/
 │           ├── models/         # Modelos de datos frontend (MVC - Model)
 │           ├── views/          # Pantallas principales (MVC - View)
 │           ├── controllers/    # Custom hooks con CRUD (MVC - Controller)
-│           ├── components/     # Componentes reutilizables (Modal, Toast, etc.)
+│           ├── components/     # Componentes reutilizables
+│           │   ├── Layout.tsx          # Layout responsive con sidebar
+│           │   ├── Sidebar.tsx         # Navegación lateral colapsable
+│           │   ├── Login.tsx           # Login con validación Zod
+│           │   ├── Pagination.tsx      # Paginación reutilizable
+│           │   ├── LoadingScreen.tsx   # Splash screen de carga
+│           │   ├── Modal.tsx           # Modal reutilizable
+│           │   ├── ConfirmDialog.tsx   # Diálogo de confirmación
+│           │   ├── Toast.tsx           # Notificaciones toast
+│           │   ├── NotificationBell.tsx # Campana de notificaciones
+│           │   └── ThemeToggle.tsx     # Toggle modo oscuro/claro
+│           ├── schemas/        # Validación de formularios con Zod
 │           ├── patterns/       # Patrones de diseño
 │           │   ├── factory/    # Factory para Surtidores
 │           │   ├── adapter/    # Adapter para conexión a API
 │           │   └── observer/   # Observer para Alertas
-│           ├── services/       # Adapter Context (React context)
+│           ├── services/       # Adapter Context + ThemeContext
 │           ├── utils/          # Aritmética binaria, decoders, helpers
-│           ├── App.tsx         # Rutas y layout principal
-│           ├── main.tsx        # Punto de entrada
-│           └── index.css       # Estilos globales (Tailwind)
+│           ├── App.tsx         # Rutas, auth state, LoadingScreen
+│           ├── main.tsx        # Punto de entrada + auto-seed
+│           └── index.css       # Estilos globales + temas + animaciones
 ├── docs/
-│   ├── BD.md                   # Documentación de tablas
-│   └── estructura.md           # Este archivo
+│   ├── BD.md                   # Documentación de tablas + índices
+│   ├── estructura.md           # Este archivo
+│   └── deploy-railway.md       # Guía de deploy y errores solucionados
 ├── desarrollo/
 │   └── avance.md               # Registro de avance
+├── Dockerfile                  # Build para Railway (Node.js 22 + pnpm v9)
+├── .dockerignore
+├── railway.toml                # Configuración de Railway
 ├── README.md
 └── .gitignore
 ```
@@ -70,6 +85,23 @@ ProyectoFinal-PrograIV/
 | **Adapter** | `patterns/adapter/` | Interfaz `DatabaseAdapter` + `SupabaseAdapter` que llama a la API REST |
 | **Observer** | `patterns/observer/` | `AlertSubject` que notifica suscriptores cuando hay nuevas alertas |
 
+## Funcionalidades
+
+- **Login** con credenciales, tarjeta de referencia y validación Zod
+- **Dashboard** con KPIs, gráficos Bar/Doughnut, slider de surtidores y alertas recientes
+- **Surtidores** CRUD con Factory pattern y validación Zod
+- **Ventas** CRUD con aritmética binaria, búsqueda/filtro y paginación
+- **Alertas** CRUD con Observer pattern, tarjetas por categoría y paginación
+- **Reportes** con decoders binarios y tablas paginadas
+- **Modo oscuro/claro** con toggle en el header
+- **Notificaciones** con campana y badge
+- **Toast notifications** centrados
+- **Diseño responsive** — mobile + desktop con sidebar colapsable
+- **Validación de formularios** con Zod (Login, Surtidores, Ventas, Alertas)
+- **Paginación reutilizable** en todas las vistas
+- **Splash screen** de carga al refrescar la página
+- **Persistencia de sesión** con localStorage (resiste F5)
+
 ## Flujo de datos
 
 ```
@@ -84,7 +116,7 @@ Usuario → Vista (React) → Controller (hook) → SupabaseAdapter (fetch)
 
 | Pantalla | Ruta | Descripción |
 |----------|------|-------------|
-| Login | `/login` | Autenticación mock (`operador` / `CELERON2026`) |
+| Login | `/login` | Autenticación mock (`admin@gmail.com` / `12345678`) con validación Zod |
 | Dashboard | `/` | KPIs + gráficos Chart.js + Observer de alertas |
 | Surtidores | `/surtidores` | CRUD completo + Factory para crear + gauges multi-combustible |
 | Ventas | `/ventas` | CRUD + aritmética binaria en vivo + gráfico por hora |
@@ -114,8 +146,10 @@ Usuario → Vista (React) → Controller (hook) → SupabaseAdapter (fetch)
 - **Frontend:** React 19 + Vite 8 + TypeScript
 - **Estilos:** Tailwind CSS 4
 - **Navegación:** React Router 7
+- **Validación:** Zod 4
 - **Backend:** Express 4 + TypeScript + tsx
 - **Base de datos:** Supabase (PostgreSQL)
 - **Gráficos:** Chart.js + react-chartjs-2
 - **Gestor de paquetes:** pnpm
 - **Concurrencia:** concurrently (backend + frontend)
+- **Deploy:** Railway + Docker (Node.js 22 + pnpm v9)

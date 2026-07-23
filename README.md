@@ -11,13 +11,9 @@
 ![Chart.js](https://img.shields.io/badge/Chart.js-FF6384?style=for-the-badge&logo=chart.js&logoColor=white)
 ![Railway](https://img.shields.io/badge/Railway-0B0D0E?style=for-the-badge&logo=railway&logoColor=white)
 ![Docker](https://img.shields.io/badge/Docker-2496ED?style=for-the-badge&logo=docker&logoColor=white)
+![Zod](https://img.shields.io/badge/Zod-3068B7?style=for-the-badge&logo=zod&logoColor=white)
 
 Sistema web para la gestión de un surtidor de gasolina. Permite registrar ventas diarias, controlar el inventario de combustibles y visualizar reportes a través de un dashboard con gráficas.
-
-## Deploy
-
-[![Railway](https://img.shields.io/badge/Deploy_en_Railway-0B0D0E?style=for-the-badge&logo=railway&logoColor=white)](https://nicolas-reguerin-actividad-final.up.railway.app)
-[![Prototipo](https://img.shields.io/badge/Acceso_al_Prototipo-1a1a2e?style=for-the-badge&logo=rocket&logoColor=white&labelColor=1a1a2e&color=16213e)](https://dogmag04.github.io/prototipos-pf/)
 
 ## Estructura del proyecto
 
@@ -43,11 +39,18 @@ ProyectoFinal-PrograIV/
 │           ├── views/          # Pantallas principales (MVC)
 │           ├── controllers/    # Custom hooks con CRUD (MVC)
 │           ├── components/     # Componentes reutilizables
-│           │   ├── ThemeToggle.tsx   # Toggle modo oscuro/claro
+│           │   ├── Layout.tsx          # Layout responsive con sidebar
+│           │   ├── Sidebar.tsx         # Navegación lateral
+│           │   ├── Login.tsx           # Login con validación Zod
+│           │   ├── ThemeToggle.tsx     # Toggle modo oscuro/claro
 │           │   ├── NotificationBell.tsx
-│           │   ├── Login.tsx
+│           │   ├── Pagination.tsx      # Paginación reutilizable
+│           │   ├── LoadingScreen.tsx   # Splash screen
+│           │   ├── Modal.tsx
+│           │   ├── ConfirmDialog.tsx
 │           │   ├── Toast.tsx
 │           │   └── ...
+│           ├── schemas/        # Validación con Zod
 │           ├── patterns/       # Patrones de diseño
 │           ├── services/       # Adapter Context + ThemeContext
 │           ├── utils/          # Aritmética binaria, decoders, helpers
@@ -117,48 +120,12 @@ PORT=3001
 
 Obtener estos valores desde el panel de Supabase > **Settings > API**.
 
-## Funcionalidades
+## Funcionalidades, patrones de diseño y API REST
 
-- **Login** con credenciales y tarjeta de referencia
-- **Dashboard** con KPIs, gráficos Bar/Doughnut y alertas recientes
-- **Surtidores** CRUD con Factory pattern
-- **Ventas** CRUD con aritmética binaria y búsqueda/filtro
-- **Alertas** CRUD con Observer pattern y tarjetas por categoría
-- **Reportes** con decoders binarios
-- **Modo oscuro/claro** con toggle en el header
-- **Notificaciones** con campana y badge
-- **Toast notifications** centrados
-
-## Patrones de diseño
-
-| Patrón | Archivo | Uso |
-|--------|---------|-----|
-| Factory | `patterns/factory/SurtidorFactory.ts` | Crear surtidores con tipos |
-| Adapter | `patterns/adapter/SupabaseAdapter.ts` | Interfaz abstracta de BD |
-| Observer | `patterns/observer/AlertObserver.ts` | Notificaciones en tiempo real |
-
-## API REST
-
-El backend expone una API REST en `http://localhost:3001`:
-
-| Método | Ruta | Descripción |
-|--------|------|-------------|
-| `GET` | `/api/health` | Verificar conexión a Supabase |
-| `POST` | `/api/seed` | Sembrar datos iniciales |
-| `GET` | `/api/combustibles` | Listar combustibles |
-| `GET` | `/api/surtidores` | Listar surtidores con surtidos |
-| `POST` | `/api/surtidores` | Crear surtidor (Factory) |
-| `PUT` | `/api/surtidores/:id` | Editar estado/ubicación |
-| `DELETE` | `/api/surtidores/:id` | Eliminar surtidor |
-| `GET` | `/api/ventas` | Listar ventas |
-| `POST` | `/api/ventas` | Registrar venta |
-| `DELETE` | `/api/ventas/:id` | Eliminar venta |
-| `GET` | `/api/alertas` | Listar alertas |
-| `POST` | `/api/alertas` | Crear alerta (Observer) |
-| `DELETE` | `/api/alertas/:id` | Eliminar alerta |
+Ver secciones detalladas en [`docs/estructura.md`](docs/estructura.md)
 
 ## Deploy
 
-Ver guía completa en [`docs/deploy-railway.md`](docs/deploy-railway.md)
+[![Railway](https://img.shields.io/badge/Deploy_en_Railway-0B0D0E?style=for-the-badge&logo=railway&logoColor=white)](https://nicolas-reguerin-actividad-final.up.railway.app)
 
-La aplicación está desplegada en Railway con Dockerfile (Node.js 22 + pnpm v9). El backend sirve los archivos estáticos del frontend en producción.
+La aplicación está desplegada en Railway con Dockerfile (Node.js 22 + pnpm v9). Ver guía completa en [`docs/deploy-railway.md`](docs/deploy-railway.md).

@@ -91,6 +91,16 @@ Registra alertas generadas por los surtidores.
 
 ---
 
+## Índices
+
+| Índice | Tabla | Campo(s) | Propósito |
+|--------|-------|----------|-----------|
+| `idx_ventas_fecha` | `ventas` | `fecha` | Búsqueda rápida de ventas por fecha |
+| `idx_ventas_surtidor` | `ventas` | `surtidor_id` | Filtrar ventas por surtidor |
+| `idx_alertas_timestamp` | `alertas` | `timestamp` | Ordenar alertas por fecha/hora |
+
+---
+
 ## Diagrama de relaciones
 
 ```
