@@ -114,8 +114,6 @@ Seguimiento del avance del proyecto. Última actualización: 2026-07-23
 - [ ] Generación de reportes avanzada (exportación PDF/CSV)
 
 ### Calidad y deploy
-- [x] Deploy en Railway (frontend + backend en un solo servicio)
-- [x] Variables de entorno configuradas en deploy (SUPABASE_URL, SUPABASE_ANON_KEY)
 - [ ] Pruebas unitarias
 - [ ] Configurar SonarQube
 
@@ -125,10 +123,13 @@ Seguimiento del avance del proyecto. Última actualización: 2026-07-23
 
 | Hash | Descripción |
 |------|-------------|
-| `6ecb686` | fix(frontend): remove if(rows.length) guards in hooks to fix auto-refresh after mutations |
-| `38d99eb` | feat(frontend): add notification bell and restructure alert system with category cards |
-| `b171628` | feat(frontend): update login with editable inputs and new credentials |
+| `8b757ee` | feat(deploy): configure backend to serve frontend and prepare for Railway deployment |
+| `11288f7` | refactor: align backend/frontend field names and fix adapter mapping for JOIN queries |
+| `2d77192` | docs: update development tracking with latest features and commits |
 | `af24f67` | fix(frontend): fix Ventas chart hour parsing and center toast notifications |
+| `b171628` | feat(frontend): update login with editable inputs and new credentials |
+| `38d99eb` | feat(frontend): add notification bell and restructure alert system with category cards |
+| `6ecb686` | fix(frontend): remove if(rows.length) guards in hooks to fix auto-refresh after mutations |
 | `3f931fa` | refactor: eliminar datos mock, usar solo datos reales de Supabase |
 | `b387791` | refactor: convertir backend a Express API REST real con separación backend/frontend |
 | `02ef6a3` | feat: implementar MVC completo, patrones de diseño, CRUD y aritmética binaria |
