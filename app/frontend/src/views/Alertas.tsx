@@ -1,14 +1,49 @@
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { useAlertas } from '../controllers/useAlertas'
 import { useSurtidores } from '../controllers/useSurtidores'
 import { useAdapter } from '../services/adapterContext'
-import { alertSubject, Observer, DBAlerta } from '../patterns/observer/AlertObserver'
 import Modal from '../components/Modal'
 import ConfirmDialog from '../components/ConfirmDialog'
 import { showToast } from '../components/Toast'
 
 const labels: Record<string, string> = { todas: 'Todas', critica: 'Crítica', advertencia: 'Advertencia', info: 'Info' }
 const tipos = ['todas', 'critica', 'advertencia', 'info'] as const
+
+const categoriaConfig: Record<string, { borde: string; bg: string; icono: React.ReactNode }> = {
+  critica: {
+    borde: 'border-l-danger',
+    bg: 'bg-danger-light',
+    icono: (
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-danger">
+        <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/>
+      </svg>
+    ),
+  },
+  advertencia: {
+    borde: 'border-l-warning',
+    bg: 'bg-warning-light',
+    icono: (
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-warning">
+        <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
+      </svg>
+    ),
+  },
+  info: {
+    borde: 'border-l-primary',
+    bg: 'bg-primary-light',
+    icono: (
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-primary">
+        <circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/>
+      </svg>
+    ),
+  },
+}
+
+const tagClasses: Record<string, string> = {
+  critica: 'text-danger bg-danger-light',
+  advertencia: 'text-warning bg-warning-light',
+  info: 'text-primary bg-primary-light',
+}
 
 export default function Alertas() {
   const adapter = useAdapter()
@@ -24,19 +59,6 @@ export default function Alertas() {
   const [selSurtidor, setSelSurtidor] = useState<number>(0)
   const [mensaje, setMensaje] = useState('')
 
-  const [notificaciones, setNotificaciones] = useState<DBAlerta[]>([])
-
-  useEffect(() => {
-    const observer: Observer = {
-      notificar(alerta: DBAlerta) {
-        setNotificaciones(prev => [alerta, ...prev].slice(0, 5))
-        showToast('info', `Nueva alerta: ${alerta.mensaje}`)
-      },
-    }
-    const unsub = alertSubject.suscribir(observer)
-    return unsub
-  }, [])
-
   const counts: Record<string, number> = {}
   tipos.forEach(t => {
     counts[t] = t === 'todas' ? alertas.length : alertas.filter(a => a.tipo === t).length
@@ -44,13 +66,21 @@ export default function Alertas() {
 
   const filtered = filter === 'todas' ? alertas : alertas.filter(a => a.tipo === filter)
 
+  const criticas = filtered.filter(a => a.tipo === 'critica')
+  const advertencias = filtered.filter(a => a.tipo === 'advertencia')
+  const infos = filtered.filter(a => a.tipo === 'info')
+
+  const secciones: { tipo: string; alertas: typeof filtered }[] = []
+  if (filter === 'todas' || filter === 'critica') secciones.push({ tipo: 'critica', alertas: criticas })
+  if (filter === 'todas' || filter === 'advertencia') secciones.push({ tipo: 'advertencia', alertas: advertencias })
+  if (filter === 'todas' || filter === 'info') secciones.push({ tipo: 'info', alertas: infos })
+
   async function handleCrear() {
     if (!selSurtidor || !mensaje.trim()) return
     setGuardando(true)
     const ok = await crear(tipo, selSurtidor, mensaje.trim())
     setGuardando(false)
     if (ok) {
-      showToast('exito', 'Alerta creada')
       setModalNueva(false)
       setMensaje('')
       setSelSurtidor(0)
@@ -68,7 +98,7 @@ export default function Alertas() {
 
   return (
     <div>
-      <div className="flex justify-between items-center mb-4">
+      <div className="flex justify-between items-center mb-5">
         <div className="flex gap-2">
           {tipos.map(t => (
             <button
@@ -92,55 +122,63 @@ export default function Alertas() {
         </button>
       </div>
 
-      {notificaciones.length > 0 && (
-        <div className="mb-4 bg-primary-light border border-primary/20 rounded-xl p-3">
-          <p className="text-xs font-semibold text-primary mb-2">Notificaciones en tiempo real (Observer):</p>
-          {notificaciones.map((n, i) => (
-            <p key={i} className="text-xs text-subtext">{n.timestamp} — {n.mensaje}</p>
-          ))}
-        </div>
-      )}
-
-      <div className="flex flex-col gap-2.5">
-        {filtered.length === 0 ? (
-          <div className="text-center py-16 text-tertiary">
-            <div className="mb-3">
-              <svg className="inline-block w-10 h-10 stroke-tertiary" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/>
-              </svg>
-            </div>
-            <p>No hay alertas de este tipo</p>
+      {filtered.length === 0 ? (
+        <div className="text-center py-16 text-tertiary">
+          <div className="mb-3">
+            <svg className="inline-block w-10 h-10 stroke-tertiary" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+            </svg>
           </div>
-        ) : (
-          filtered.map(a => (
-            <div
-              key={a.id}
-              className={`bg-surface border border-border border-l-4 ${a.tipo === 'critica' ? 'border-l-danger' : a.tipo === 'advertencia' ? 'border-l-warning' : 'border-l-primary'} rounded-2xl p-4 flex items-start justify-between gap-4 hover:bg-surface-hover transition-colors`}
-            >
-              <div className="flex flex-col gap-1.5 flex-1">
-                <span className="text-sm font-medium text-text">{a.mensaje}</span>
-                <div className="flex gap-3 text-xs text-tertiary">
-                  <span>{a.surtidor}</span>
-                  <span>{a.timestamp}</span>
+          <p>No hay alertas de este tipo</p>
+        </div>
+      ) : (
+        <div className="flex flex-col gap-5">
+          {secciones.map(({ tipo: t, alertas: lista }) => {
+            if (lista.length === 0) return null
+            const cfg = categoriaConfig[t]
+            return (
+              <div key={t} className="bg-surface border border-border rounded-2xl overflow-hidden">
+                <div className="px-5 py-3.5 border-b border-border flex items-center justify-between">
+                  <div className="flex items-center gap-2.5">
+                    {cfg.icono}
+                    <span className="text-sm font-bold text-text">{labels[t]}</span>
+                  </div>
+                  <span className="text-xs text-tertiary bg-surface-hover px-2.5 py-1 rounded-full">{lista.length}</span>
+                </div>
+                <div className="p-3 flex flex-col gap-2">
+                  {lista.map(a => (
+                    <div
+                      key={a.id}
+                      className={`bg-bg border border-border border-l-4 ${cfg.borde} rounded-xl p-4 flex items-start justify-between gap-4 hover:bg-surface-hover transition-colors`}
+                    >
+                      <div className="flex flex-col gap-1.5 flex-1">
+                        <span className="text-sm font-medium text-text">{a.mensaje}</span>
+                        <div className="flex gap-3 text-xs text-tertiary">
+                          <span>{a.surtidor}</span>
+                          <span>{a.timestamp}</span>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <span className={`text-[11px] font-bold uppercase tracking-wide whitespace-nowrap px-3 py-1 rounded-full ${tagClasses[a.tipo]}`}>
+                          {labels[a.tipo]}
+                        </span>
+                        <button
+                          onClick={() => setConfirmarEliminar(a.id)}
+                          className="text-tertiary hover:text-danger transition-colors p-1"
+                        >
+                          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                            <polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
+                          </svg>
+                        </button>
+                      </div>
+                    </div>
+                  ))}
                 </div>
               </div>
-              <div className="flex items-center gap-2">
-                <span className={`text-[11px] font-bold uppercase tracking-wide whitespace-nowrap px-3 py-1 rounded-full ${a.tipo === 'critica' ? 'text-danger bg-danger-light' : a.tipo === 'advertencia' ? 'text-warning bg-warning-light' : 'text-primary bg-primary-light'}`}>
-                  {a.tipo}
-                </span>
-                <button
-                  onClick={() => setConfirmarEliminar(a.id)}
-                  className="text-tertiary hover:text-danger transition-colors p-1"
-                >
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
-                  </svg>
-                </button>
-              </div>
-            </div>
-          ))
-        )}
-      </div>
+            )
+          })}
+        </div>
+      )}
 
       <Modal abierto={modalNueva} titulo="Nueva Alerta" onClose={() => setModalNueva(false)}>
         <div className="flex flex-col gap-4">

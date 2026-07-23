@@ -1,4 +1,3 @@
-import { useEffect, useState } from 'react'
 import { Bar, Doughnut } from 'react-chartjs-2'
 import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, ArcElement, Title, Tooltip, Legend } from 'chart.js'
 import { useSurtidores } from '../controllers/useSurtidores'
@@ -6,7 +5,6 @@ import { useVentas } from '../controllers/useVentas'
 import { useAlertas } from '../controllers/useAlertas'
 import { useCombustibles } from '../controllers/useCombustibles'
 import { useAdapter } from '../services/adapterContext'
-import { alertSubject, Observer } from '../patterns/observer/AlertObserver'
 import { fmt, fmtNum, statusTagClass, getNivelClass, getNivelColor } from '../utils/uiHelpers'
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, ArcElement, Title, Tooltip, Legend)
@@ -17,18 +15,6 @@ export default function Dashboard() {
   const { data: ventas } = useVentas(adapter)
   const { data: alertas } = useAlertas(adapter)
   const { data: combustibles } = useCombustibles(adapter)
-
-  const [ultimaAlerta, setUltimaAlerta] = useState<string | null>(null)
-
-  useEffect(() => {
-    const observer: Observer = {
-      notificar(alerta) {
-        setUltimaAlerta(`${alerta.timestamp} — ${alerta.mensaje}`)
-      },
-    }
-    const unsub = alertSubject.suscribir(observer)
-    return unsub
-  }, [])
 
   const totalLitros = ventas.reduce((a, v) => a + v.litros, 0)
   const totalVentas = ventas.reduce((a, v) => a + v.total, 0)
@@ -48,13 +34,6 @@ export default function Dashboard() {
 
   return (
     <div>
-      {ultimaAlerta && (
-        <div className="mb-4 bg-primary-light border border-primary/20 rounded-xl p-3 flex items-center gap-3">
-          <span className="w-2 h-2 rounded-full bg-primary animate-pulse" />
-          <span className="text-xs text-primary font-medium">Observer: {ultimaAlerta}</span>
-        </div>
-      )}
-
       <div className="grid grid-cols-4 gap-4 mb-6">
         <div className="bg-surface border border-border rounded-2xl p-5 flex flex-col gap-2 hover:bg-surface-hover transition-colors">
           <span className="text-sm font-medium text-subtext">Ventas Hoy</span>

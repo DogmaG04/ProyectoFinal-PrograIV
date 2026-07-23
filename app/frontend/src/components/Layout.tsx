@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { Outlet, useLocation } from 'react-router-dom'
 import Sidebar from './Sidebar'
+import NotificationBell from './NotificationBell'
 
 const titles: Record<string, string> = {
   '/': 'Dashboard',
@@ -26,7 +27,8 @@ export default function Layout() {
       <Sidebar />
       <header className="bg-surface border-b border-border flex items-center justify-between px-8" style={{ gridArea: 'header' }}>
         <h1 className="text-text text-xl font-bold">{title}</h1>
-        <div className="flex items-center gap-5 text-sm text-subtext">
+        <div className="flex items-center gap-3 text-sm text-subtext">
+          <NotificationBell />
           <div className="flex items-center gap-2">
             <span className="w-2 h-2 rounded-full bg-success" />
             <span>Sistema en línea</span>
