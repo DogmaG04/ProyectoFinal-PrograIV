@@ -1,4 +1,6 @@
 import 'dotenv/config'
+import path from 'path'
+import { fileURLToPath } from 'url'
 import express from 'express'
 import cors from 'cors'
 import { verificarConexion } from './services/supabaseClient'
@@ -20,7 +22,9 @@ import { sembrarDatos } from './controllers/seedController'
 const app = express()
 const PORT = process.env.PORT || 3001
 
-app.use(cors({ origin: ['http://localhost:5173', 'http://localhost:4173'] }))
+const isProd = process.env.NODE_ENV === 'production'
+
+app.use(cors(isProd ? {} : { origin: ['http://localhost:5173', 'http://localhost:4173'] }))
 app.use(express.json())
 
 app.get('/api/health', async (_req, res) => {
@@ -105,6 +109,15 @@ app.delete('/api/alertas/:id', async (req, res) => {
   if (!ok) return res.status(400).json({ error: 'No se pudo eliminar la alerta' })
   res.json({ ok: true })
 })
+
+if (isProd) {
+  const __dirname = path.dirname(fileURLToPath(import.meta.url))
+  const distPath = path.join(__dirname, '../frontend/dist')
+  app.use(express.static(distPath))
+  app.get('*', (_req, res) => {
+    res.sendFile(path.join(distPath, 'index.html'))
+  })
+}
 
 app.listen(PORT, async () => {
   console.log(`🚀 Backend corriendo en http://localhost:${PORT}`)

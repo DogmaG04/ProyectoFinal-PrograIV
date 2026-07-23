@@ -93,6 +93,14 @@ Seguimiento del avance del proyecto. Última actualización: 2026-07-23
 ### Root — Concurrently
 - [x] `app/package.json` — ejecuta backend + frontend con `pnpm dev`
 - [x] Script `install:all` para instalar dependencias de ambos servicios
+- [x] Script `build` para build del frontend (para deploy)
+- [x] Script `start` para iniciar el backend en producción
+
+### Deploy — Railway
+- [x] Backend sirve archivos estáticos del frontend en producción (`express.static`)
+- [x] SPA fallback: `app.get('*', ...)` devuelve `index.html` para rutas de React Router
+- [x] CORS configurado dinámicamente (dev: localhost, prod: todos los orígenes)
+- [x] Variables de entorno: `SUPABASE_URL`, `SUPABASE_ANON_KEY`, `PORT`, `NODE_ENV`
 
 ### Prototipo
 - [x] Prototipo visual en repo separado (GitHub Pages)
@@ -106,10 +114,10 @@ Seguimiento del avance del proyecto. Última actualización: 2026-07-23
 - [ ] Generación de reportes avanzada (exportación PDF/CSV)
 
 ### Calidad y deploy
+- [x] Deploy en Railway (frontend + backend en un solo servicio)
+- [x] Variables de entorno configuradas en deploy (SUPABASE_URL, SUPABASE_ANON_KEY)
 - [ ] Pruebas unitarias
 - [ ] Configurar SonarQube
-- [ ] Deploy en Vercel/Render
-- [ ] Variables de entorno configuradas en deploy
 
 ---
 
