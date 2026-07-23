@@ -11,7 +11,7 @@ Seguimiento del avance del proyecto. Última actualización: 2026-07-23
 - [x] Estructura de carpetas (`app/backend`, `app/frontend`, `docs`, `desarrollo`)
 - [x] `.gitignore` configurado
 - [x] README.md con badges, descripción, link del prototipo e instalación
-- [x] Documentación en `docs/BD.md` (tablas: surtidores, ventas, alertas)
+- [x] Documentación en `docs/BD.md` (tablas: combustibles, surtidores, surtidos, ventas, alertas)
 - [x] Documentación en `docs/estructura.md` (arquitectura MVC)
 
 ### Frontend — Base
@@ -39,6 +39,11 @@ Seguimiento del avance del proyecto. Última actualización: 2026-07-23
 - [x] Reportes — Cards por combustible y surtidor + charts Bar horizontales
 - [x] Tema oscuro global (Plus Jakarta Sans, colores personalizados, scrollbar)
 
+### Backend — Base de datos
+- [x] Migración SQL en `app/backend/migrations/001_create_tables.sql`
+- [x] Esquema con 5 tablas: combustibles, surtidores, surtidos, ventas, alertas
+- [x] Datos iniciales (combustibles ANH 2026, surtidores, surtidos)
+
 ### Prototipo
 - [x] Prototipo visual en repo separado (GitHub Pages)
 - [x] Link del prototipo en README
@@ -53,7 +58,6 @@ Seguimiento del avance del proyecto. Última actualización: 2026-07-23
 ## Lo que falta por implementar
 
 ### Backend (Supabase)
-- [ ] Crear migraciones SQL en `app/backend/`
 - [ ] Configurar conexión Supabase en `services/supabase.ts`
 - [ ] Implementar CRUD para surtidores
 - [ ] Implementar CRUD para ventas
@@ -85,6 +89,7 @@ Seguimiento del avance del proyecto. Última actualización: 2026-07-23
 
 | Hash | Descripción |
 |------|-------------|
+| `fa22cab` | feat(backend): create SQL migration for multi-combustible schema |
 | `8fa8641` | feat(frontend): redesign all views with charts, stats cards, and modern dark UI |
 | `c5f2714` | feat(frontend): update app shell with new sidebar, header, and dark theme |
 | `e315a21` | feat(frontend): add login page component |
