@@ -1,30 +1,27 @@
-export type AlertaTipo = 'nivel_critico' | 'nivel_bajo' | 'mantenimiento' | 'fuga'
-export type AlertaEstado = 'activa' | 'resuelta'
-
 export interface AlertaData {
   id: number
-  surtidor_id: number
-  tipo: AlertaTipo
-  fecha: string
-  estado: AlertaEstado
+  tipo: 'critica' | 'advertencia' | 'info'
+  surtidor: string
+  mensaje: string
+  timestamp: string
 }
 
 export class Alerta {
   id: number
-  surtidor_id: number
-  tipo: AlertaTipo
-  fecha: string
-  estado: AlertaEstado
+  tipo: 'critica' | 'advertencia' | 'info'
+  surtidor: string
+  mensaje: string
+  timestamp: string
 
-  constructor({ id, surtidor_id, tipo, fecha, estado }: AlertaData) {
-    this.id = id
-    this.surtidor_id = surtidor_id
-    this.tipo = tipo
-    this.fecha = fecha
-    this.estado = estado
+  constructor(data: AlertaData) {
+    this.id = data.id
+    this.tipo = data.tipo
+    this.surtidor = data.surtidor
+    this.mensaje = data.mensaje
+    this.timestamp = data.timestamp
   }
 
-  get esUrgente(): boolean {
-    return this.tipo === 'nivel_critico' || this.tipo === 'fuga'
+  get esCritica(): boolean {
+    return this.tipo === 'critica'
   }
 }

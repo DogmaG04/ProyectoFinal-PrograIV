@@ -1,29 +1,32 @@
 export interface VentaData {
   id: number
   fecha: string
+  surtidor: string
   combustible: string
   litros: number
-  precio: number
   total: number
-  surtidor_id: number
+  surtidorId: number
+  combustibleId: number
 }
 
 export class Venta {
   id: number
   fecha: string
+  surtidor: string
   combustible: string
   litros: number
-  precio: number
   total: number
-  surtidor_id: number
+  surtidorId: number
+  combustibleId: number
 
-  constructor({ id, fecha, combustible, litros, precio, total, surtidor_id }: VentaData) {
-    this.id = id
-    this.fecha = fecha
-    this.combustible = combustible
-    this.litros = litros
-    this.precio = precio
-    this.total = total
-    this.surtidor_id = surtidor_id
+  constructor(data: VentaData) {
+    this.id = data.id
+    this.fecha = data.fecha
+    this.surtidor = data.surtidor
+    this.combustible = data.combustible
+    this.litros = data.litros
+    this.total = data.total
+    this.surtidorId = data.surtidorId
+    this.combustibleId = data.combustibleId
   }
 }

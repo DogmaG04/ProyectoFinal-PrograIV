@@ -1,34 +1,55 @@
+export interface Combustible {
+  id: number
+  nombre: string
+  color: string
+  precioLitro: number
+}
+
+export interface Surtido {
+  combustibleId: number
+  nivel: number
+  capacidad: number
+}
+
 export interface SurtidorData {
   id: number
-  numero: number
-  combustible: string
-  capacidad: number
-  nivel: number
+  codigo: string
+  ubicacion: string
+  estado: 'activo' | 'mantenimiento' | 'fuera de servicio'
+  surtidos: Surtido[]
 }
 
 export class Surtidor {
   id: number
-  numero: number
-  combustible: string
-  capacidad: number
-  nivel: number
+  codigo: string
+  ubicacion: string
+  estado: 'activo' | 'mantenimiento' | 'fuera de servicio'
+  surtidos: Surtido[]
 
-  constructor({ id, numero, combustible, capacidad, nivel }: SurtidorData) {
-    this.id = id
-    this.numero = numero
-    this.combustible = combustible
-    this.capacidad = capacidad
-    this.nivel = nivel
+  constructor(data: SurtidorData) {
+    this.id = data.id
+    this.codigo = data.codigo
+    this.ubicacion = data.ubicacion
+    this.estado = data.estado
+    this.surtidos = data.surtidos
   }
 
-  get porcentajeNivel(): string {
-    return ((this.nivel / this.capacidad) * 100).toFixed(1)
+  getNivel(combustibleId: number): number {
+    const s = this.surtidos.find(x => x.combustibleId === combustibleId)
+    return s ? s.nivel : 0
   }
 
-  get estadoNivel(): 'critico' | 'bajo' | 'normal' {
-    const pct = parseFloat(this.porcentajeNivel)
-    if (pct <= 20) return 'critico'
-    if (pct <= 50) return 'bajo'
-    return 'normal'
+  getCapacidad(combustibleId: number): number {
+    const s = this.surtidos.find(x => x.combustibleId === combustibleId)
+    return s ? s.capacidad : 0
+  }
+
+  getPorcentaje(combustibleId: number): number {
+    const cap = this.getCapacidad(combustibleId)
+    return cap > 0 ? (this.getNivel(combustibleId) / cap) * 100 : 0
+  }
+
+  get esActivo(): boolean {
+    return this.estado === 'activo'
   }
 }
