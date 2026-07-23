@@ -1,36 +1,48 @@
-import { useState, useEffect } from 'react'
-import { supabase } from '../services/supabase'
+import { useState, useEffect, useCallback } from 'react'
 import { Alerta } from '../models/Alerta'
 import { mockAlertas } from '../services/mockData'
-import { formatTimestamp } from '../utils/formatDate'
+import { DatabaseAdapter } from '../patterns/adapter/DatabaseAdapter'
+import { alertSubject } from '../patterns/observer/AlertObserver'
 
-export function useAlertas() {
+export function useAlertas(adapter: DatabaseAdapter | null = null) {
   const [data, setData] = useState<Alerta[]>(mockAlertas)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
-  useEffect(() => {
-    supabase
-      .from('alertas')
-      .select('*, surtidores!inner(codigo)')
-      .then(({ data: rows, error: err }) => {
-        if (err) {
-          setError(err.message)
-          setLoading(false)
-          return
-        }
-        if (!rows?.length) { setLoading(false); return }
-        const alertas = rows.map((r: any) => new Alerta({
-          id: r.id,
-          tipo: r.tipo,
-          surtidor: r.surtidores?.codigo || '',
-          mensaje: r.mensaje,
-          timestamp: formatTimestamp(r.timestamp),
-        }))
+  const cargar = useCallback(() => {
+    if (!adapter) { setLoading(false); return }
+    adapter.obtenerAlertas().then(rows => {
+      if (rows.length) {
+        const alertas = rows.map(r => new Alerta(r))
         setData(alertas)
-        setLoading(false)
-      })
-  }, [])
+        alertSubject.notificarMuchas(rows)
+      }
+      setLoading(false)
+    }).catch(err => {
+      setError(err.message)
+      setLoading(false)
+    })
+  }, [adapter])
 
-  return { data, loading, error }
+  useEffect(() => { cargar() }, [cargar])
+
+  const crear = useCallback(async (tipo: 'critica' | 'advertencia' | 'info', surtidorId: number, mensaje: string) => {
+    if (!adapter) return false
+    const result = await adapter.crearAlerta(tipo, surtidorId, mensaje)
+    if (result) {
+      cargar()
+      alertSubject.notificarTodos(result)
+      return true
+    }
+    return false
+  }, [adapter, cargar])
+
+  const eliminar = useCallback(async (id: number) => {
+    if (!adapter) return false
+    const ok = await adapter.eliminarAlerta(id)
+    if (ok) cargar()
+    return ok
+  }, [adapter, cargar])
+
+  return { data, loading, error, crear, eliminar, recargar: cargar }
 }

@@ -1,23 +1,28 @@
+import { useState } from 'react'
 import { Bar } from 'react-chartjs-2'
 import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend } from 'chart.js'
 import { useVentas } from '../controllers/useVentas'
 import { useSurtidores } from '../controllers/useSurtidores'
 import { useCombustibles } from '../controllers/useCombustibles'
+import { useAdapter } from '../services/adapterContext'
+import { decodificarReportes, decodificarVentas } from '../utils/decoders'
+import { fmt, fmtNum, statusTagClass } from '../utils/uiHelpers'
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend)
 
-const fmt = (n: number) => 'Bs. ' + n.toLocaleString('es-BO', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
-const fmtNum = (n: number) => n.toLocaleString('es-BO', { minimumFractionDigits: 1, maximumFractionDigits: 1 })
-
-function statusTagClass(estado: string) {
-  const map: Record<string, string> = { activo: 'text-success bg-success-light', mantenimiento: 'text-warning bg-warning-light', 'fuera de servicio': 'text-danger bg-danger-light' }
-  return map[estado] || ''
-}
-
 export default function Reportes() {
-  const { data: combustibles } = useCombustibles()
-  const { data: ventas } = useVentas()
-  const { data: surtidores } = useSurtidores()
+  const adapter = useAdapter()
+  const { data: combustibles } = useCombustibles(adapter)
+  const { data: ventas } = useVentas(adapter)
+  const { data: surtidores } = useSurtidores(adapter)
+
+  const [mostrarBinario, setMostrarBinario] = useState(false)
+
+  const precios: Record<number, number> = {}
+  combustibles.forEach(c => { precios[c.id] = c.precioLitro })
+
+  const reportes = decodificarReportes(ventas, combustibles)
+  const ventasDecodificadas = decodificarVentas(ventas, precios)
 
   const porComb = combustibles.map(c => {
     const ventasC = ventas.filter(v => v.combustibleId === c.id)
@@ -51,11 +56,22 @@ export default function Reportes() {
 
   return (
     <div>
-      <div className="mb-4">
+      <div className="flex justify-between items-center mb-4">
         <span className="text-base font-bold text-text">Resumen por Combustible</span>
+        <button
+          onClick={() => setMostrarBinario(!mostrarBinario)}
+          className={`px-4 py-2 rounded-xl text-xs font-medium border transition-all ${
+            mostrarBinario
+              ? 'bg-primary-light border-primary/30 text-primary'
+              : 'bg-surface border-border text-subtext hover:text-text'
+          }`}
+        >
+          {mostrarBinario ? 'Binario: ON' : 'Binario: OFF'}
+        </button>
       </div>
+
       <div className="grid grid-cols-3 gap-4 mb-6">
-        {porComb.map(c => (
+        {porComb.map((c, i) => (
           <div key={c.id} className="bg-surface border border-border rounded-2xl p-5">
             <div className="flex items-center gap-2.5 pb-3 mb-4 border-b border-border">
               <span className="w-2.5 h-2.5 rounded-full" style={{ background: c.color }} />
@@ -66,6 +82,14 @@ export default function Reportes() {
               <div className="flex justify-between text-sm"><span className="text-subtext">Litros vendidos</span><span className="text-text font-semibold">{fmtNum(c.litros)} L</span></div>
               <div className="flex justify-between text-sm"><span className="text-subtext">Total en ventas</span><span className="text-text font-semibold">{fmt(c.total)}</span></div>
               <div className="flex justify-between text-sm"><span className="text-subtext">Transacciones</span><span className="text-text font-semibold">{c.transacciones}</span></div>
+              {mostrarBinario && reportes[i] && (
+                <>
+                  <div className="border-t border-border my-1" />
+                  <div className="flex justify-between text-xs"><span className="text-tertiary">Litros (bin)</span><span className="text-primary font-mono font-bold">{reportes[i].totalLitrosBinario}</span></div>
+                  <div className="flex justify-between text-xs"><span className="text-tertiary">Total (bin)</span><span className="text-primary font-mono font-bold">{reportes[i].totalVentasBinario}</span></div>
+                  <div className="flex justify-between text-xs"><span className="text-tertiary">Precio prom (bin)</span><span className="text-primary font-mono font-bold">{reportes[i].precioPromedioBinario}</span></div>
+                </>
+              )}
             </div>
           </div>
         ))}
@@ -163,6 +187,40 @@ export default function Reportes() {
           />
         </div>
       </div>
+
+      {mostrarBinario && (
+        <div className="mt-6 bg-surface border border-border rounded-2xl overflow-hidden">
+          <div className="px-5 py-3.5 border-b border-border">
+            <span className="text-base font-bold text-text">Ventas Decodificadas (Binario)</span>
+          </div>
+          <table className="w-full border-collapse">
+            <thead>
+              <tr className="bg-surface-hover">
+                <th className="text-left px-5 py-3.5 text-xs font-semibold text-subtext">Surtidor</th>
+                <th className="text-left px-5 py-3.5 text-xs font-semibold text-subtext">Combustible</th>
+                <th className="text-left px-5 py-3.5 text-xs font-semibold text-subtext">Litros (Dec)</th>
+                <th className="text-left px-5 py-3.5 text-xs font-semibold text-subtext">Litros (Bin)</th>
+                <th className="text-left px-5 py-3.5 text-xs font-semibold text-subtext">Precio (Bin)</th>
+                <th className="text-left px-5 py-3.5 text-xs font-semibold text-subtext">Total (Dec)</th>
+                <th className="text-left px-5 py-3.5 text-xs font-semibold text-subtext">Total (Bin)</th>
+              </tr>
+            </thead>
+            <tbody>
+              {ventasDecodificadas.map(v => (
+                <tr key={v.id} className="border-b border-border hover:bg-surface-hover transition-colors">
+                  <td className="px-5 py-3 text-sm font-semibold text-text">{v.surtidor}</td>
+                  <td className="px-5 py-3 text-sm text-text">{v.combustible}</td>
+                  <td className="px-5 py-3 text-sm text-text">{fmtNum(v.litros)}</td>
+                  <td className="px-5 py-3 text-sm font-mono text-primary font-bold">{v.litrosBinario}</td>
+                  <td className="px-5 py-3 text-sm font-mono text-primary font-bold">{v.precioBinario}</td>
+                  <td className="px-5 py-3 text-sm font-semibold text-text">{fmt(v.total)}</td>
+                  <td className="px-5 py-3 text-sm font-mono text-success font-bold">{v.totalBinario}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
     </div>
   )
 }

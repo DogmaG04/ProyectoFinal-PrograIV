@@ -2,12 +2,16 @@ import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import './index.css'
 import App from './App'
-import { verificarConexion, sembrarDatos } from './services/supabase'
+import { verificarConexion } from './backend'
+import { sembrarDatos } from './backend'
 
 verificarConexion().then(ok => { if (ok) sembrarDatos() })
 
-createRoot(document.getElementById('root')).render(
-  <StrictMode>
-    <App />
-  </StrictMode>,
-)
+const root = document.getElementById('root')
+if (root) {
+  createRoot(root).render(
+    <StrictMode>
+      <App />
+    </StrictMode>,
+  )
+}

@@ -1,23 +1,21 @@
 import { useState, useEffect } from 'react'
-import { supabase } from '../services/supabase'
 import { Combustible } from '../models/Surtidor'
 import { COMBUSTIBLES } from '../services/mockData'
+import { DatabaseAdapter } from '../patterns/adapter/DatabaseAdapter'
 
-export function useCombustibles() {
+export function useCombustibles(adapter: DatabaseAdapter | null = null) {
   const [data, setData] = useState<Combustible[]>(COMBUSTIBLES)
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    supabase
-      .from('combustibles')
-      .select('id, nombre, color, precio_litro')
-      .then(({ data: rows, error }) => {
-        if (!error && rows?.length) {
-          setData(rows.map(r => ({ id: r.id, nombre: r.nombre, color: r.color, precioLitro: r.precio_litro })))
-        }
-        setLoading(false)
-      })
-  }, [])
+    if (!adapter) { setLoading(false); return }
+    adapter.obtenerCombustibles().then(rows => {
+      if (rows.length) {
+        setData(rows.map(r => ({ id: r.id, nombre: r.nombre, color: r.color, precioLitro: r.precioLitro })))
+      }
+      setLoading(false)
+    })
+  }, [adapter])
 
   return { data, loading }
 }

@@ -2,11 +2,16 @@ import { useState } from 'react'
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import Layout from './components/Layout'
 import Login from './components/Login'
+import ToastContainer from './components/Toast'
 import Dashboard from './views/Dashboard'
 import Surtidores from './views/Surtidores'
 import Ventas from './views/Ventas'
 import Alertas from './views/Alertas'
 import Reportes from './views/Reportes'
+import { AdapterProvider } from './services/adapterContext'
+import { SupabaseAdapter } from './patterns/adapter/SupabaseAdapter'
+
+const adapter = new SupabaseAdapter()
 
 export default function App() {
   const [loggedIn, setLoggedIn] = useState(false)
@@ -16,16 +21,19 @@ export default function App() {
   }
 
   return (
-    <BrowserRouter>
-      <Routes>
-        <Route element={<Layout />}>
-          <Route path="/" element={<Dashboard />} />
-          <Route path="/surtidores" element={<Surtidores />} />
-          <Route path="/ventas" element={<Ventas />} />
-          <Route path="/alertas" element={<Alertas />} />
-          <Route path="/reportes" element={<Reportes />} />
-        </Route>
-      </Routes>
-    </BrowserRouter>
+    <AdapterProvider adapter={adapter}>
+      <BrowserRouter>
+        <Routes>
+          <Route element={<Layout />}>
+            <Route path="/" element={<Dashboard />} />
+            <Route path="/surtidores" element={<Surtidores />} />
+            <Route path="/ventas" element={<Ventas />} />
+            <Route path="/alertas" element={<Alertas />} />
+            <Route path="/reportes" element={<Reportes />} />
+          </Route>
+        </Routes>
+      </BrowserRouter>
+      <ToastContainer />
+    </AdapterProvider>
   )
 }

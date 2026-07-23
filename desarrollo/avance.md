@@ -22,78 +22,78 @@ Seguimiento del avance del proyecto. Última actualización: 2026-07-23
 - [x] Dependencias: `react-router-dom`, `tailwindcss`, `@tailwindcss/vite`
 - [x] Dependencias: `chart.js`, `react-chartjs-2` (gráficos)
 
-### Frontend — Estructura MVC
-- [x] Models tipados: `Surtidor.ts`, `Venta.ts`, `Alerta.ts` (con interfaces)
-- [x] Models reestructurados para multi-combustible por surtidor
-- [x] Services: `mockData.ts` con constante `COMBUSTIBLES` y datos extendidos
-
-### Frontend — Controllers
-- [x] Custom hooks: `useCombustibles`, `useSurtidores`, `useVentas`, `useAlertas`
-- [x] Utilidad `formatDate.ts` para formateo de timestamps
-- [x] Cada hook carga datos desde Supabase con fallback a mockData
-
-### Frontend — UI
-- [x] Login page con autenticación mock
-- [x] Sidebar izquierdo con navegación e iconos SVG
-- [x] Layout con grid, header con reloj y estado del sistema
-- [x] Dashboard — KPIs + gráficos Bar/Doughnut (Chart.js) + alertas recientes
-- [x] Surtidores — Cards con gauges multi-combustible y estados (activo/mantenimiento/fuera de servicio)
-- [x] Ventas — KPIs + gráfico Line de ventas por hora + tabla con totales
-- [x] Alertas — Filtros por tipo (crítica/advertencia/info) con badges de color
-- [x] Reportes — Cards por combustible y surtidor + charts Bar horizontales
-- [x] Tema oscuro global (Plus Jakarta Sans, colores personalizados, scrollbar)
-
 ### Backend — Base de datos
 - [x] Migración SQL en `app/backend/migrations/001_create_tables.sql`
 - [x] Esquema con 5 tablas: combustibles, surtidores, surtidos, ventas, alertas
 - [x] Datos iniciales (combustibles ANH 2026, surtidores, surtidos)
 
-### Backend — Conexión
-- [x] Cliente Supabase en `services/supabase.ts`
-- [x] Función `verificarConexion()` con try/catch y mensajes en consola
-- [x] Función `sembrarDatos()` para poblar Supabase desde el navegador
-- [x] Auto-seed ejecutado al iniciar la app si las tablas están vacías
+### Backend — MVC separado (dentro de frontend/src)
+- [x] `src/backend/models/` — Interfaces tipadas: `Combustible`, `Surtidor`, `Surtido`, `Venta`, `Alerta`, `TipoAlerta`
+- [x] `src/backend/services/supabaseClient.ts` — Cliente Supabase + `verificarConexion()`
+- [x] `src/backend/controllers/` — Controladores CRUD completos:
+  - `combustibleController.ts` — `obtenerCombustibles()`
+  - `surtidorController.ts` — `obtenerSurtidores()`, `crearSurtidor()`, `editarSurtidor()`, `eliminarSurtidor()`
+  - `ventaController.ts` — `obtenerVentas()`, `crearVenta()`, `eliminarVenta()`
+  - `alertaController.ts` — `obtenerAlertas()`, `crearAlerta()`, `eliminarAlerta()`
+  - `seedController.ts` — `sembrarDatos()` (inserta todos los datos de prueba)
+  - `index.ts` — Barrel export de todos los controllers
+- [x] `src/backend/index.ts` — Barrel export de models + controllers + services
+- [x] `app/backend/` — Carpeta original mantenida para SQL migrations y referencia
+
+### Frontend — MVC (models, views, controllers)
+- [x] Models tipados en `src/models/` — `Surtidor.ts`, `Venta.ts`, `Alerta.ts`
+- [x] Controllers (custom hooks) con CRUD completo:
+  - `useSurtidores` — `cargar()`, `crear()`, `editar()`, `eliminar()`
+  - `useVentas` — `cargar()`, `registrar()`, `eliminar()`
+  - `useAlertas` — `cargar()`, `crear()`, `eliminar()` + integración Observer
+  - `useCombustibles` — `cargar()` con fallback a mockData
+
+### Frontend — UI
+- [x] Login page con autenticación mock (`operador` / `CELERON2026`)
+- [x] Sidebar izquierdo con navegación e iconos SVG
+- [x] Layout con grid, header con reloj y estado del sistema
+- [x] Dashboard — KPIs + gráficos Bar/Doughnut + alertas recientes + Observer banner
+- [x] Surtidores — CRUD: crear (Factory), editar estado, eliminar con confirmación
+- [x] Ventas — CRUD: registrar venta con cálculo binario en vivo, eliminar
+- [x] Alertas — CRUD: crear alerta, eliminar con confirmación + Observer en tiempo real
+- [x] Reportes — Decoders integrados con toggle binario + tabla completa
+- [x] Componentes UI reutilizables: `Modal.tsx`, `Toast.tsx`, `ConfirmDialog.tsx`
+- [x] Tema oscuro global (Plus Jakarta Sans, colores personalizados, scrollbar)
+- [x] Animación `slide-in` para notificaciones Toast
+
+### Patrones de diseño
+- [x] **Factory** (`patterns/factory/SurtidorFactory.ts`) — crear surtidores con tipos: estacionario, portátil, industrial
+- [x] **Adapter** (`patterns/adapter/DatabaseAdapter.ts` + `SupabaseAdapter.ts`) — interfaz abstracta de BD intercambiable, CRUD completo
+- [x] **Observer** (`patterns/observer/AlertObserver.ts`) — `AlertSubject` con suscripción y notificación de alertas
+
+### Funcionalidad avanzada
+- [x] **Aritmética binaria** (`utils/binaryMath.ts`) — `decimalABinario()`, `binarioADecimal()`, `sumarBinarios()`, `restarBinarios()`, `multiplicarBinarios()`
+- [x] **Decodificadores** (`utils/decoders.ts`) — `decodificarVenta()`, `decodificarReporte()`, `decodificarVentas()`, `decodificarReportes()`
+
+### Calidad de código
+- [x] Funciones helper compartidas en `utils/uiHelpers.ts`
+- [x] Adapter Context para inyección de dependencias (`services/adapterContext.tsx`)
 - [x] Variables de entorno en `.env.example`
-- [x] Dependencia `@supabase/supabase-js`
+- [x] TypeScript compila sin errores (`tsc --noEmit` limpio)
+- [x] Build de producción exitoso (`vite build`)
+- [x] Lint limpio (solo Fast Refresh warnings no bloqueantes)
 
 ### Prototipo
 - [x] Prototipo visual en repo separado (GitHub Pages)
 - [x] Link del prototipo en README
 
-### Patrones de diseño
-- [ ] Factory para Surtidores
-- [ ] Adapter para conexión a BD
-- [ ] Observer para Alertas
-
 ---
 
 ## Lo que falta por implementar
 
-### Backend (Supabase)
-- [ ] Implementar CRUD para surtidores
-- [ ] Implementar CRUD para ventas
-- [ ] Implementar CRUD para alertas
-- [ ] Implementar Adapter pattern para abstraer la BD
-
 ### Funcionalidad
-- [x] Vistas conectadas a Supabase a través de custom hooks
-- [x] Fallback automático a mockData si Supabase no está disponible o sin datos
-- [x] Tablas, gráficos y filtros funcionan con datos reales desde Supabase
-- [ ] Sistema de ventas con aritmética binaria
-- [ ] Decodificadores para reportes
-- [ ] Generación de reportes avanzada
-
-### Patrones de diseño
-- [ ] Factory pattern en `patterns/factory/`
-- [ ] Adapter pattern en `patterns/adapter/`
-- [ ] Observer pattern en `patterns/observer/`
+- [ ] Generación de reportes avanzada (exportación PDF/CSV)
 
 ### Calidad y deploy
 - [ ] Pruebas unitarias
 - [ ] Configurar SonarQube
-- [ ] Refactorización general
 - [ ] Deploy en Vercel/Render
-- [ ] Variables de entorno configuradas
+- [ ] Variables de entorno configuradas en deploy
 
 ---
 

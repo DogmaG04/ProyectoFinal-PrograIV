@@ -1,39 +1,48 @@
-import { useState, useEffect } from 'react'
-import { supabase } from '../services/supabase'
+import { useState, useEffect, useCallback } from 'react'
 import { Surtidor } from '../models/Surtidor'
 import { mockSurtidores } from '../services/mockData'
+import { DatabaseAdapter } from '../patterns/adapter/DatabaseAdapter'
 
-export function useSurtidores() {
+export function useSurtidores(adapter: DatabaseAdapter | null = null) {
   const [data, setData] = useState<Surtidor[]>(mockSurtidores)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
-  useEffect(() => {
-    supabase
-      .from('surtidores')
-      .select('*, surtidos(*)')
-      .then(({ data: rows, error: err }) => {
-        if (err) {
-          setError(err.message)
-          setLoading(false)
-          return
-        }
-        if (!rows?.length) { setLoading(false); return }
-        const surtidores = rows.map((r: any) => new Surtidor({
-          id: r.id,
-          codigo: r.codigo,
-          ubicacion: r.ubicacion,
-          estado: r.estado,
-          surtidos: (r.surtidos || []).map((s: any) => ({
-            combustibleId: s.combustible_id,
-            nivel: s.nivel,
-            capacidad: s.capacidad,
-          })),
-        }))
-        setData(surtidores)
-        setLoading(false)
-      })
-  }, [])
+  const cargar = useCallback(() => {
+    if (!adapter) { setLoading(false); return }
+    adapter.obtenerSurtidores().then(rows => {
+      if (rows.length) {
+        setData(rows.map(r => new Surtidor(r)))
+      }
+      setLoading(false)
+    }).catch(err => {
+      setError(err.message)
+      setLoading(false)
+    })
+  }, [adapter])
 
-  return { data, loading, error }
+  useEffect(() => { cargar() }, [cargar])
+
+  const crear = useCallback(async (codigo: string, ubicacion: string, estado: 'activo' | 'mantenimiento' | 'fuera de servicio', surtidos: { combustibleId: number; nivel: number; capacidad: number }[]) => {
+    if (!adapter) return false
+    const result = await adapter.crearSurtidor(codigo, ubicacion, estado, surtidos)
+    if (result) { cargar(); return true }
+    return false
+  }, [adapter, cargar])
+
+  const editar = useCallback(async (id: number, cambios: Partial<{ ubicacion: string; estado: 'activo' | 'mantenimiento' | 'fuera de servicio' }>) => {
+    if (!adapter) return false
+    const ok = await adapter.editarSurtidor(id, cambios)
+    if (ok) cargar()
+    return ok
+  }, [adapter, cargar])
+
+  const eliminar = useCallback(async (id: number) => {
+    if (!adapter) return false
+    const ok = await adapter.eliminarSurtidor(id)
+    if (ok) cargar()
+    return ok
+  }, [adapter, cargar])
+
+  return { data, loading, error, crear, editar, eliminar, recargar: cargar }
 }
