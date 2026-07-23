@@ -1,6 +1,8 @@
 import { Bar } from 'react-chartjs-2'
 import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend } from 'chart.js'
-import { COMBUSTIBLES, mockVentas, mockSurtidores } from '../services/mockData'
+import { useVentas } from '../controllers/useVentas'
+import { useSurtidores } from '../controllers/useSurtidores'
+import { useCombustibles } from '../controllers/useCombustibles'
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend)
 
@@ -13,8 +15,12 @@ function statusTagClass(estado: string) {
 }
 
 export default function Reportes() {
-  const porComb = COMBUSTIBLES.map(c => {
-    const ventasC = mockVentas.filter(v => v.combustibleId === c.id)
+  const { data: combustibles } = useCombustibles()
+  const { data: ventas } = useVentas()
+  const { data: surtidores } = useSurtidores()
+
+  const porComb = combustibles.map(c => {
+    const ventasC = ventas.filter(v => v.combustibleId === c.id)
     return {
       ...c,
       litros: ventasC.reduce((a, v) => a + v.litros, 0),
@@ -23,9 +29,9 @@ export default function Reportes() {
     }
   })
 
-  const porSurt = mockSurtidores.filter(s => s.estado !== 'fuera de servicio').map(s => {
-    const ventasS = mockVentas.filter(v => v.surtidorId === s.id)
-    const porCombS = COMBUSTIBLES.map(c => {
+  const porSurt = surtidores.filter(s => s.estado !== 'fuera de servicio').map(s => {
+    const ventasS = ventas.filter(v => v.surtidorId === s.id)
+    const porCombS = combustibles.map(c => {
       const v = ventasS.filter(x => x.combustibleId === c.id)
       return {
         nombre: c.nombre,

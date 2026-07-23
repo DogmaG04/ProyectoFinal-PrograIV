@@ -1,4 +1,5 @@
-import { mockSurtidores, COMBUSTIBLES } from '../services/mockData'
+import { useSurtidores } from '../controllers/useSurtidores'
+import { useCombustibles } from '../controllers/useCombustibles'
 
 function statusTagClass(estado: string) {
   const map: Record<string, string> = { activo: 'text-success bg-success-light', mantenimiento: 'text-warning bg-warning-light', 'fuera de servicio': 'text-danger bg-danger-light' }
@@ -18,12 +19,15 @@ function getNivelColor(nivel: number) {
 const fmtNum = (n: number) => n.toLocaleString('es-BO', { minimumFractionDigits: 1, maximumFractionDigits: 1 })
 
 export default function Surtidores() {
+  const { data: surtidores } = useSurtidores()
+  const { data: combustibles } = useCombustibles()
+
   return (
     <div>
       <div className="grid grid-cols-2 gap-4">
-        {mockSurtidores.map(s => {
+        {surtidores.map(s => {
           const gauges = s.surtidos.map(st => {
-            const c = COMBUSTIBLES.find(x => x.id === st.combustibleId)
+            const c = combustibles.find(x => x.id === st.combustibleId)
             if (!c) return null
             const pct = (st.nivel / st.capacidad) * 100
             const litrosAct = (pct * st.capacidad) / 100

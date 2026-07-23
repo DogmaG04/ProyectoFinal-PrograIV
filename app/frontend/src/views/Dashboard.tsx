@@ -1,6 +1,9 @@
 import { Bar, Doughnut } from 'react-chartjs-2'
 import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, ArcElement, Title, Tooltip, Legend } from 'chart.js'
-import { mockSurtidores, mockVentas, mockAlertas, COMBUSTIBLES } from '../services/mockData'
+import { useSurtidores } from '../controllers/useSurtidores'
+import { useVentas } from '../controllers/useVentas'
+import { useAlertas } from '../controllers/useAlertas'
+import { useCombustibles } from '../controllers/useCombustibles'
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, ArcElement, Title, Tooltip, Legend)
 
@@ -23,19 +26,24 @@ function getNivelColor(nivel: number) {
 }
 
 export default function Dashboard() {
-  const totalLitros = mockVentas.reduce((a, v) => a + v.litros, 0)
-  const totalVentas = mockVentas.reduce((a, v) => a + v.total, 0)
-  const activos = mockSurtidores.filter(s => s.estado === 'activo').length
-  const criticas = mockAlertas.filter(a => a.tipo === 'critica').length
+  const { data: surtidores } = useSurtidores()
+  const { data: ventas } = useVentas()
+  const { data: alertas } = useAlertas()
+  const { data: combustibles } = useCombustibles()
 
-  const porComb = COMBUSTIBLES.map(c => ({
+  const totalLitros = ventas.reduce((a, v) => a + v.litros, 0)
+  const totalVentas = ventas.reduce((a, v) => a + v.total, 0)
+  const activos = surtidores.filter(s => s.estado === 'activo').length
+  const criticas = alertas.filter(a => a.tipo === 'critica').length
+
+  const porComb = combustibles.map(c => ({
     nombre: c.nombre,
-    litros: mockVentas.filter(v => v.combustibleId === c.id).reduce((a, v) => a + v.litros, 0),
+    litros: ventas.filter(v => v.combustibleId === c.id).reduce((a, v) => a + v.litros, 0),
     color: c.color,
   }))
 
   const porEstado: Record<string, number> = {}
-  mockSurtidores.forEach(s => { porEstado[s.estado] = (porEstado[s.estado] || 0) + 1 })
+  surtidores.forEach(s => { porEstado[s.estado] = (porEstado[s.estado] || 0) + 1 })
   const estadoColors: Record<string, string> = { activo: '#34d399', mantenimiento: '#fbbf24', 'fuera de servicio': '#f87171' }
   const estadoLabels = Object.keys(porEstado)
 
@@ -45,22 +53,22 @@ export default function Dashboard() {
         <div className="bg-surface border border-border rounded-2xl p-5 flex flex-col gap-2 hover:bg-surface-hover transition-colors">
           <span className="text-sm font-medium text-subtext">Ventas Hoy</span>
           <span className="text-primary text-[28px] font-bold leading-none">{fmt(totalVentas)}</span>
-          <span className="text-xs text-tertiary">{mockVentas.length} transacciones</span>
+          <span className="text-xs text-tertiary">{ventas.length} transacciones</span>
         </div>
         <div className="bg-surface border border-border rounded-2xl p-5 flex flex-col gap-2 hover:bg-surface-hover transition-colors">
           <span className="text-sm font-medium text-subtext">Litros Vendidos</span>
           <span className="text-success text-[28px] font-bold leading-none">{fmtNum(totalLitros)} L</span>
-          <span className="text-xs text-tertiary">3 tipos de combustible</span>
+          <span className="text-xs text-tertiary">{combustibles.length} tipos de combustible</span>
         </div>
         <div className="bg-surface border border-border rounded-2xl p-5 flex flex-col gap-2 hover:bg-surface-hover transition-colors">
           <span className="text-sm font-medium text-subtext">Surtidores Activos</span>
-          <span className="text-warning text-[28px] font-bold leading-none">{activos} / {mockSurtidores.length}</span>
-          <span className="text-xs text-tertiary">{mockSurtidores.length - activos} inactivos</span>
+          <span className="text-warning text-[28px] font-bold leading-none">{activos} / {surtidores.length}</span>
+          <span className="text-xs text-tertiary">{surtidores.length - activos} inactivos</span>
         </div>
         <div className="bg-surface border border-border rounded-2xl p-5 flex flex-col gap-2 hover:bg-surface-hover transition-colors">
           <span className="text-sm font-medium text-subtext">Alertas Críticas</span>
           <span className="text-danger text-[28px] font-bold leading-none">{criticas}</span>
-          <span className="text-xs text-tertiary">{mockAlertas.length} total</span>
+          <span className="text-xs text-tertiary">{alertas.length} total</span>
         </div>
       </div>
 
@@ -79,7 +87,7 @@ export default function Dashboard() {
               </tr>
             </thead>
             <tbody>
-              {mockSurtidores.map(s => {
+              {surtidores.map(s => {
                 const diesel = s.surtidos.find(x => x.combustibleId === 3)
                 const pct = diesel ? (diesel.nivel / diesel.capacidad) * 100 : 0
                 return (
@@ -109,10 +117,10 @@ export default function Dashboard() {
         <div className="bg-surface border border-border rounded-2xl">
           <div className="px-5 py-3.5 border-b border-border flex items-center justify-between">
             <span className="text-base font-bold text-text">Alertas Recientes</span>
-            <span className="text-xs text-tertiary bg-surface-hover px-2.5 py-1 rounded-full">{mockAlertas.length} total</span>
+            <span className="text-xs text-tertiary bg-surface-hover px-2.5 py-1 rounded-full">{alertas.length} total</span>
           </div>
           <div className="p-3 flex flex-col gap-2.5">
-            {mockAlertas.slice(0, 5).map(a => (
+            {alertas.slice(0, 5).map(a => (
               <div key={a.id} className={`bg-surface border border-border border-l-4 ${a.tipo === 'critica' ? 'border-l-danger' : a.tipo === 'advertencia' ? 'border-l-warning' : 'border-l-primary'} rounded-2xl p-4 flex items-start justify-between gap-4 hover:bg-surface-hover transition-colors`}>
                 <div className="flex flex-col gap-1.5 flex-1">
                   <span className="text-sm font-medium text-text">{a.mensaje}</span>

@@ -1,24 +1,28 @@
 import { Line } from 'react-chartjs-2'
 import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend, Filler } from 'chart.js'
-import { mockVentas, COMBUSTIBLES } from '../services/mockData'
+import { useVentas } from '../controllers/useVentas'
+import { useCombustibles } from '../controllers/useCombustibles'
 
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend, Filler)
 
 const fmt = (n: number) => 'Bs. ' + n.toLocaleString('es-BO', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
 const fmtNum = (n: number) => n.toLocaleString('es-BO', { minimumFractionDigits: 1, maximumFractionDigits: 1 })
 
-function getCombColor(combustibleId: number) {
-  const c = COMBUSTIBLES.find(x => x.id === combustibleId)
-  return c ? c.color : '#6b7280'
-}
-
 export default function Ventas() {
-  const totalVentas = mockVentas.reduce((a, v) => a + v.total, 0)
-  const totalLitros = mockVentas.reduce((a, v) => a + v.litros, 0)
-  const promedio = mockVentas.length ? totalVentas / mockVentas.length : 0
+  const { data: ventas } = useVentas()
+  const { data: combustibles } = useCombustibles()
+
+  function getCombColor(combustibleId: number) {
+    const c = combustibles.find(x => x.id === combustibleId)
+    return c ? c.color : '#6b7280'
+  }
+
+  const totalVentas = ventas.reduce((a, v) => a + v.total, 0)
+  const totalLitros = ventas.reduce((a, v) => a + v.litros, 0)
+  const promedio = ventas.length ? totalVentas / ventas.length : 0
 
   const horas: Record<string, number> = {}
-  mockVentas.forEach(v => {
+  ventas.forEach(v => {
     const h = v.fecha.split(' ')[1]?.split(':')[0] || '00'
     horas[h] = (horas[h] || 0) + v.total
   })
@@ -43,7 +47,7 @@ export default function Ventas() {
         </div>
         <div className="bg-surface border border-border rounded-2xl p-5 flex flex-col gap-2 hover:bg-surface-hover transition-colors">
           <span className="text-sm font-medium text-subtext">Transacciones</span>
-          <span className="text-text text-[28px] font-bold leading-none">{mockVentas.length}</span>
+          <span className="text-text text-[28px] font-bold leading-none">{ventas.length}</span>
         </div>
       </div>
 
@@ -84,7 +88,7 @@ export default function Ventas() {
       <div className="bg-surface border border-border rounded-2xl overflow-hidden">
         <div className="px-5 py-3.5 border-b border-border flex items-center justify-between">
           <span className="text-base font-bold text-text">Registro de Ventas</span>
-          <span className="text-xs text-tertiary bg-surface-hover px-2.5 py-1 rounded-full">{mockVentas.length} registros</span>
+          <span className="text-xs text-tertiary bg-surface-hover px-2.5 py-1 rounded-full">{ventas.length} registros</span>
         </div>
         <table className="w-full border-collapse">
           <thead>
@@ -98,7 +102,7 @@ export default function Ventas() {
             </tr>
           </thead>
           <tbody>
-            {mockVentas.map((v, i) => (
+            {ventas.map((v, i) => (
               <tr key={v.id} className="border-b border-border hover:bg-surface-hover transition-colors">
                 <td className="px-5 py-3 text-sm text-tertiary">{i + 1}</td>
                 <td className="px-5 py-3 text-sm text-text">{v.fecha}</td>

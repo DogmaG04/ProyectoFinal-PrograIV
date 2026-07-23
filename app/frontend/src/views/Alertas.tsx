@@ -1,18 +1,19 @@
 import { useState } from 'react'
-import { mockAlertas } from '../services/mockData'
+import { useAlertas } from '../controllers/useAlertas'
 
 const labels: Record<string, string> = { todas: 'Todas', critica: 'Crítica', advertencia: 'Advertencia', info: 'Info' }
 const tipos = ['todas', 'critica', 'advertencia', 'info'] as const
 
 export default function Alertas() {
+  const { data: alertas } = useAlertas()
   const [filter, setFilter] = useState<string>('todas')
 
   const counts: Record<string, number> = {}
   tipos.forEach(t => {
-    counts[t] = t === 'todas' ? mockAlertas.length : mockAlertas.filter(a => a.tipo === t).length
+    counts[t] = t === 'todas' ? alertas.length : alertas.filter(a => a.tipo === t).length
   })
 
-  const filtered = filter === 'todas' ? mockAlertas : mockAlertas.filter(a => a.tipo === filter)
+  const filtered = filter === 'todas' ? alertas : alertas.filter(a => a.tipo === filter)
 
   return (
     <div>
