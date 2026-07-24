@@ -73,13 +73,13 @@ export default function Reportes() {
           />
           <button
             onClick={() => exportCSV(porComb.map(c => ({ Combustible: c.nombre, 'Precio/L': c.precioLitro, Litros: c.litros, Total: c.total, Transacciones: c.transacciones })), 'reporte_combustibles')}
-            className="px-3 py-1.5 rounded-lg text-xs font-medium bg-success text-white hover:bg-success/80 transition-colors"
+            className="px-3 py-1.5 rounded-lg text-xs font-medium bg-[#059669] text-white hover:bg-[#047857] transition-colors"
           >
             Exportar a CSV
           </button>
           <button
             onClick={() => exportPDF('Reporte por Combustible', ['Combustible', 'Precio/L', 'Litros', 'Total', 'Transacciones'], porComb.map(c => [c.nombre, fmt(c.precioLitro), fmtNum(c.litros), fmt(c.total), String(c.transacciones)]), 'reporte_combustibles')}
-            className="px-3 py-1.5 rounded-lg text-xs font-medium bg-danger text-white hover:bg-danger/80 transition-colors"
+            className="px-3 py-1.5 rounded-lg text-xs font-medium bg-[#dc2626] text-white hover:bg-[#b91c1c] transition-colors"
           >
             Exportar a PDF
           </button>
@@ -170,13 +170,13 @@ export default function Reportes() {
           />
           <button
             onClick={() => exportCSV(porSurt.map(s => ({ Surtidor: s.codigo, Ubicación: s.ubicacion, Estado: s.estado, Ventas: s.total, Litros: s.litros, Transacciones: s.transacciones })), 'reporte_surtidores')}
-            className="px-3 py-1.5 rounded-lg text-xs font-medium bg-success text-white hover:bg-success/80 transition-colors"
+            className="px-3 py-1.5 rounded-lg text-xs font-medium bg-[#059669] text-white hover:bg-[#047857] transition-colors"
           >
             Exportar a CSV
           </button>
           <button
             onClick={() => exportPDF('Reporte por Surtidor', ['Surtidor', 'Ubicación', 'Estado', 'Ventas', 'Litros', 'Transacciones'], porSurt.map(s => [s.codigo, s.ubicacion, s.estado, fmt(s.total), fmtNum(s.litros), String(s.transacciones)]), 'reporte_surtidores')}
-            className="px-3 py-1.5 rounded-lg text-xs font-medium bg-danger text-white hover:bg-danger/80 transition-colors"
+            className="px-3 py-1.5 rounded-lg text-xs font-medium bg-[#dc2626] text-white hover:bg-[#b91c1c] transition-colors"
           >
             Exportar a PDF
           </button>
