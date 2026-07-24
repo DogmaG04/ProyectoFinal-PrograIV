@@ -8,6 +8,7 @@ import { useAdapter } from '../services/adapterContext'
 import { decodificarReportes, decodificarVentas } from '../utils/decoders'
 import { fmt, fmtNum, statusTagClass } from '../utils/uiHelpers'
 import Pagination from '../components/Pagination'
+import VoiceButton from '../components/VoiceButton'
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend)
 
@@ -63,24 +64,38 @@ export default function Reportes() {
     <div>
       <div className="flex flex-wrap justify-between items-center gap-2 mb-4">
         <span className="text-sm md:text-base font-bold text-text">Resumen por Combustible</span>
-        <button
-          onClick={() => setMostrarBinario(!mostrarBinario)}
-          className={`px-4 py-2 rounded-xl text-xs font-medium border transition-all ${
-            mostrarBinario
-              ? 'bg-primary-light border-primary/30 text-primary'
-              : 'bg-surface border-border text-subtext hover:text-text'
-          }`}
-        >
-          {mostrarBinario ? 'Binario: ON' : 'Binario: OFF'}
-        </button>
+        <div className="flex items-center gap-2">
+          <VoiceButton
+            text={porComb.map(c => `${c.nombre}: ${fmtNum(c.litros)} litros vendidos, total ${fmt(c.total)}, ${c.transacciones} transacciones`).join('. ')}
+            label="Leer resumen"
+            variant="sm"
+          />
+          <button
+            onClick={() => setMostrarBinario(!mostrarBinario)}
+            className={`px-4 py-2 rounded-xl text-xs font-medium border transition-all ${
+              mostrarBinario
+                ? 'bg-primary-light border-primary/30 text-primary'
+                : 'bg-surface border-border text-subtext hover:text-text'
+            }`}
+          >
+            {mostrarBinario ? 'Binario: ON' : 'Binario: OFF'}
+          </button>
+        </div>
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
         {porComb.map((c, i) => (
           <div key={c.id} className="bg-surface border border-border rounded-2xl p-3 sm:p-5">
-            <div className="flex items-center gap-2.5 pb-3 mb-4 border-b border-border">
-              <span className="w-2.5 h-2.5 rounded-full" style={{ background: c.color }} />
-              <span className="text-sm font-bold" style={{ color: c.color }}>{c.nombre}</span>
+            <div className="flex items-center justify-between pb-3 mb-4 border-b border-border">
+              <div className="flex items-center gap-2.5">
+                <span className="w-2.5 h-2.5 rounded-full" style={{ background: c.color }} />
+                <span className="text-sm font-bold" style={{ color: c.color }}>{c.nombre}</span>
+              </div>
+              <VoiceButton
+                text={`${c.nombre}: precio por litro ${fmt(c.precioLitro)}, ${fmtNum(c.litros)} litros vendidos, total en ventas ${fmt(c.total)}, ${c.transacciones} transacciones`}
+                label="Leer"
+                variant="sm"
+              />
             </div>
             <div className="space-y-2">
               <div className="flex justify-between text-sm"><span className="text-subtext">Precio / litro</span><span className="text-text font-semibold">{fmt(c.precioLitro)}</span></div>
@@ -132,14 +147,26 @@ export default function Reportes() {
         </div>
       </div>
 
-      <div className="mb-4">
+      <div className="flex items-center justify-between mb-4">
         <span className="text-sm md:text-base font-bold text-text">Resumen por Surtidor</span>
+        <VoiceButton
+          text={porSurt.map(s => `${s.codigo} en ${s.ubicacion}: ventas totales ${fmt(s.total)}, ${fmtNum(s.litros)} litros, ${s.transacciones} transacciones`).join('. ')}
+          label="Leer resumen"
+          variant="sm"
+        />
       </div>
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-6">
         {porSurt.map(s => (
           <div key={s.id} className="bg-surface border border-border rounded-2xl p-3 sm:p-5">
             <div className="flex items-center justify-between mb-3">
-              <span className="text-sm font-bold text-subtext uppercase tracking-wide">{s.codigo} — {s.ubicacion}</span>
+              <div className="flex items-center gap-2">
+                <span className="text-sm font-bold text-subtext uppercase tracking-wide">{s.codigo} — {s.ubicacion}</span>
+                <VoiceButton
+                  text={`${s.codigo} en ${s.ubicacion}: ventas totales ${fmt(s.total)}, ${fmtNum(s.litros)} litros, ${s.transacciones} transacciones. Desglose por combustible: ${s.porComb.map(c => `${c.nombre} ${fmtNum(c.litros)} litros ${fmt(c.total)}`).join(', ')}`}
+                  label="Leer"
+                  variant="sm"
+                />
+              </div>
               <span className={`inline-flex items-center px-3 py-1 rounded-full text-[11px] font-semibold uppercase tracking-wide ${statusTagClass(s.estado)}`}>
                 {s.estado}
               </span>

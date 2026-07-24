@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react'
 import { alertSubject, Observer, DBAlerta } from '../patterns/observer/AlertObserver'
+import { useSpeech } from '../hooks/useSpeech'
 
 const tipoConfig: Record<string, { color: string; bg: string; label: string }> = {
   critica: { color: 'text-danger', bg: 'bg-danger-light', label: 'Crítica' },
@@ -11,6 +12,7 @@ export default function NotificationBell() {
   const [notificaciones, setNotificaciones] = useState<DBAlerta[]>([])
   const [abierto, setAbierto] = useState(false)
   const ref = useRef<HTMLDivElement>(null)
+  const { speak, stop, speaking, supported } = useSpeech({ lang: 'es-ES' })
 
   useEffect(() => {
     const observer: Observer = {
@@ -33,6 +35,19 @@ export default function NotificationBell() {
     return () => document.removeEventListener('mousedown', handleClick)
   }, [abierto])
 
+  function leerNotificaciones() {
+    if (speaking) {
+      stop()
+      return
+    }
+    if (notificaciones.length === 0) return
+    const texto = notificaciones.map(n => {
+      const tipoLabel = n.tipo === 'critica' ? 'Crítica' : n.tipo === 'advertencia' ? 'Advertencia' : 'Informativa'
+      return `Notificación ${tipoLabel}: ${n.mensaje}. ${n.surtidor}. ${n.timestamp}`
+    }).join('. ')
+    speak(texto)
+  }
+
   return (
     <div ref={ref} className="relative">
       <button
@@ -54,14 +69,39 @@ export default function NotificationBell() {
         <div className="absolute right-0 top-full mt-2 w-80 bg-surface border border-border rounded-2xl shadow-xl z-50 overflow-hidden">
           <div className="px-4 py-3 border-b border-border flex items-center justify-between">
             <span className="text-sm font-bold text-text">Notificaciones</span>
-            {notificaciones.length > 0 && (
-              <button
-                onClick={() => setNotificaciones([])}
-                className="text-xs text-tertiary hover:text-text transition-colors"
-              >
-                Limpiar
-              </button>
-            )}
+            <div className="flex items-center gap-2">
+              {notificaciones.length > 0 && supported && (
+                <button
+                  onClick={leerNotificaciones}
+                  className={`p-1.5 rounded-lg transition-colors ${
+                    speaking
+                      ? 'bg-danger/10 text-danger hover:bg-danger/20'
+                      : 'bg-primary/10 text-primary hover:bg-primary/20'
+                  }`}
+                  title={speaking ? 'Detener lectura' : 'Leer notificaciones'}
+                >
+                  {speaking ? (
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/>
+                    </svg>
+                  ) : (
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/>
+                      <path d="M15.54 8.46a5 5 0 0 1 0 7.07"/>
+                      <path d="M19.07 4.93a10 10 0 0 1 0 14.14"/>
+                    </svg>
+                  )}
+                </button>
+              )}
+              {notificaciones.length > 0 && (
+                <button
+                  onClick={() => setNotificaciones([])}
+                  className="text-xs text-tertiary hover:text-text transition-colors"
+                >
+                  Limpiar
+                </button>
+              )}
+            </div>
           </div>
           <div className="max-h-80 overflow-y-auto">
             {notificaciones.length === 0 ? (

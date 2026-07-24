@@ -4,9 +4,11 @@ import { useSurtidores } from '../controllers/useSurtidores'
 import { useAdapter } from '../services/adapterContext'
 import Modal from '../components/Modal'
 import ConfirmDialog from '../components/ConfirmDialog'
+import VoiceButton from '../components/VoiceButton'
 import { showToast } from '../components/Toast'
 import { alertaSchema } from '../schemas'
 import Pagination from '../components/Pagination'
+import { useSpeech } from '../hooks/useSpeech'
 
 const labels: Record<string, string> = { todas: 'Todas', critica: 'Crítica', advertencia: 'Advertencia', info: 'Info' }
 const tipos = ['todas', 'critica', 'advertencia', 'info'] as const
@@ -64,6 +66,13 @@ export default function Alertas() {
   const [touch, setTouch] = useState<Record<string, boolean>>({})
   const [paginaAlerta, setPaginaAlerta] = useState(1)
   const alertasPorPagina = 7
+
+  const { speaking } = useSpeech({ lang: 'es-ES' })
+
+  function getAlertaTexto(a: typeof alertas[0]) {
+    const tipoLabel = a.tipo === 'critica' ? 'Crítica' : a.tipo === 'advertencia' ? 'Advertencia' : 'Informativa'
+    return `Alerta ${tipoLabel}: ${a.mensaje}. Surtidor ${a.surtidor}. ${a.timestamp}`
+  }
 
   const counts: Record<string, number> = {}
   tipos.forEach(t => {
@@ -141,12 +150,21 @@ export default function Alertas() {
             </button>
           ))}
         </div>
-        <button
-          onClick={() => setModalNueva(true)}
-          className="px-4 py-2.5 bg-primary text-white rounded-xl text-sm font-semibold hover:opacity-90 transition-opacity"
-        >
-          + Nueva Alerta
-        </button>
+        <div className="flex items-center gap-2">
+          {filtered.length > 0 && (
+            <VoiceButton
+              text={filtered.map(a => getAlertaTexto(a)).join('. ')}
+              label={speaking ? 'Detener' : 'Leer alertas'}
+              variant="sm"
+            />
+          )}
+          <button
+            onClick={() => setModalNueva(true)}
+            className="px-4 py-2.5 bg-primary text-white rounded-xl text-sm font-semibold hover:opacity-90 transition-opacity"
+          >
+            + Nueva Alerta
+          </button>
+        </div>
       </div>
 
       {filtered.length === 0 ? (
@@ -189,6 +207,11 @@ export default function Alertas() {
                         <span className={`text-[11px] font-bold uppercase tracking-wide whitespace-nowrap px-3 py-1 rounded-full ${tagClasses[a.tipo]}`}>
                           {labels[a.tipo]}
                         </span>
+                        <VoiceButton
+                          text={getAlertaTexto(a)}
+                          label="Leer"
+                          variant="sm"
+                        />
                         <button
                           onClick={() => setConfirmarEliminar(a.id)}
                           className="text-tertiary hover:text-danger transition-colors p-1"
