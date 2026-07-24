@@ -1,6 +1,6 @@
 # Registro de Desarrollo — Surtidor de Gasolina
 
-Seguimiento del avance del proyecto. Última actualización: 2026-07-23
+Seguimiento del avance del proyecto. Última actualización: 2026-07-24
 
 ---
 
@@ -66,10 +66,10 @@ Seguimiento del avance del proyecto. Última actualización: 2026-07-23
 - [x] Surtidores — CRUD: crear (Factory), editar estado, eliminar con confirmación
 - [x] Ventas — CRUD: registrar venta con cálculo binario, eliminar, búsqueda/filtro, gráfica por hora
 - [x] Alertas — CRUD: crear alerta, eliminar, tarjetas agrupadas por categoría (Crítica/Advertencia/Info)
-- [x] Reportes — Decoders integrados con toggle binario + tabla completa
-- [x] Campana de notificaciones (`NotificationBell.tsx`) — badge con conteo, dropdown con alertas nuevas
+- [x] Reportes — Decoders integrados con toggle binario + tabla completa + exportación CSV/PDF
+- [x] Campana de notificaciones (`NotificationBell.tsx`) — badge con conteo, dropdown con alertas nuevas + lectura de voz
 - [x] Toast notifications centrados arriba (exito/error/info)
-- [x] Componentes UI reutilizables: `Modal.tsx`, `Toast.tsx`, `ConfirmDialog.tsx`
+- [x] Componentes UI reutilizables: `Modal.tsx`, `Toast.tsx`, `ConfirmDialog.tsx`, `VoiceButton.tsx`
 - [x] Tema oscuro global (Plus Jakarta Sans, colores personalizados, scrollbar)
 - [x] Animación `slide-in` para notificaciones Toast
 
@@ -97,6 +97,8 @@ Seguimiento del avance del proyecto. Última actualización: 2026-07-23
 ### Funcionalidad avanzada
 - [x] **Aritmética binaria** (`utils/binaryMath.ts`) — `decimalABinario()`, `binarioADecimal()`, `sumarBinarios()`, `restarBinarios()`, `multiplicarBinarios()`
 - [x] **Decodificadores** (`utils/decoders.ts`) — `decodificarVenta()`, `decodificarReporte()`, `decodificarVentas()`, `decodificarReportes()`
+- [x] **Speech Synthesis** (`hooks/useSpeech.ts` + `components/VoiceButton.tsx`) — lectura de alertas y reportes en voz alta con Web Speech API
+- [x] **Exportación de reportes** (`utils/exportHelpers.ts`) — exportar datos a CSV (papaparse) y PDF (jspdf + jspdf-autotable)
 
 ### Calidad de código
 - [x] Funciones helper compartidas en `utils/uiHelpers.ts`
@@ -131,7 +133,7 @@ Seguimiento del avance del proyecto. Última actualización: 2026-07-23
 ## Lo que falta por implementar
 
 ### Funcionalidad
-- [ ] Generación de reportes avanzada (exportación PDF/CSV)
+- [x] Generación de reportes avanzada (exportación PDF/CSV)
 
 ### Calidad
 - [ ] Pruebas unitarias
@@ -143,6 +145,7 @@ Seguimiento del avance del proyecto. Última actualización: 2026-07-23
 
 | Hash | Descripción |
 |------|-------------|
+| `d18fd51` | feat(frontend): add Speech Synthesis for reading alerts and reports |
 | `a0a3f27` | docs: add Railway deployment guide with errors and solutions |
 | `90fce75` | fix(deploy): remove startCommand to let Dockerfile CMD handle startup |
 | `80eb302` | fix(deploy): pin pnpm to v9 to avoid build scripts approval requirement |

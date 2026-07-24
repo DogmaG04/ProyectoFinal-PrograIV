@@ -7,6 +7,7 @@ import { useCombustibles } from '../controllers/useCombustibles'
 import { useAdapter } from '../services/adapterContext'
 import { decodificarReportes, decodificarVentas } from '../utils/decoders'
 import { fmt, fmtNum, statusTagClass } from '../utils/uiHelpers'
+import { exportCSV, exportPDF } from '../utils/exportHelpers'
 import Pagination from '../components/Pagination'
 import VoiceButton from '../components/VoiceButton'
 
@@ -70,6 +71,18 @@ export default function Reportes() {
             label="Leer resumen"
             variant="sm"
           />
+          <button
+            onClick={() => exportCSV(porComb.map(c => ({ Combustible: c.nombre, 'Precio/L': c.precioLitro, Litros: c.litros, Total: c.total, Transacciones: c.transacciones })), 'reporte_combustibles')}
+            className="px-3 py-1.5 rounded-lg text-xs font-medium bg-success/10 text-success hover:bg-success/20 transition-colors"
+          >
+            CSV
+          </button>
+          <button
+            onClick={() => exportPDF('Reporte por Combustible', ['Combustible', 'Precio/L', 'Litros', 'Total', 'Transacciones'], porComb.map(c => [c.nombre, fmt(c.precioLitro), fmtNum(c.litros), fmt(c.total), String(c.transacciones)]), 'reporte_combustibles')}
+            className="px-3 py-1.5 rounded-lg text-xs font-medium bg-danger/10 text-danger hover:bg-danger/20 transition-colors"
+          >
+            PDF
+          </button>
           <button
             onClick={() => setMostrarBinario(!mostrarBinario)}
             className={`px-4 py-2 rounded-xl text-xs font-medium border transition-all ${
@@ -149,11 +162,25 @@ export default function Reportes() {
 
       <div className="flex items-center justify-between mb-4">
         <span className="text-sm md:text-base font-bold text-text">Resumen por Surtidor</span>
-        <VoiceButton
-          text={porSurt.map(s => `${s.codigo} en ${s.ubicacion}: ventas totales ${fmt(s.total)}, ${fmtNum(s.litros)} litros, ${s.transacciones} transacciones`).join('. ')}
-          label="Leer resumen"
-          variant="sm"
-        />
+        <div className="flex items-center gap-2">
+          <VoiceButton
+            text={porSurt.map(s => `${s.codigo} en ${s.ubicacion}: ventas totales ${fmt(s.total)}, ${fmtNum(s.litros)} litros, ${s.transacciones} transacciones`).join('. ')}
+            label="Leer resumen"
+            variant="sm"
+          />
+          <button
+            onClick={() => exportCSV(porSurt.map(s => ({ Surtidor: s.codigo, Ubicación: s.ubicacion, Estado: s.estado, Ventas: s.total, Litros: s.litros, Transacciones: s.transacciones })), 'reporte_surtidores')}
+            className="px-3 py-1.5 rounded-lg text-xs font-medium bg-success/10 text-success hover:bg-success/20 transition-colors"
+          >
+            CSV
+          </button>
+          <button
+            onClick={() => exportPDF('Reporte por Surtidor', ['Surtidor', 'Ubicación', 'Estado', 'Ventas', 'Litros', 'Transacciones'], porSurt.map(s => [s.codigo, s.ubicacion, s.estado, fmt(s.total), fmtNum(s.litros), String(s.transacciones)]), 'reporte_surtidores')}
+            className="px-3 py-1.5 rounded-lg text-xs font-medium bg-danger/10 text-danger hover:bg-danger/20 transition-colors"
+          >
+            PDF
+          </button>
+        </div>
       </div>
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-6">
         {porSurt.map(s => (
