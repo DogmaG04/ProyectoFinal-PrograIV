@@ -73,15 +73,15 @@ export default function Reportes() {
           />
           <button
             onClick={() => exportCSV(porComb.map(c => ({ Combustible: c.nombre, 'Precio/L': c.precioLitro, Litros: c.litros, Total: c.total, Transacciones: c.transacciones })), 'reporte_combustibles')}
-            className="px-3 py-1.5 rounded-lg text-xs font-medium bg-success/10 text-success hover:bg-success/20 transition-colors"
+            className="px-3 py-1.5 rounded-lg text-xs font-medium bg-success text-white hover:bg-success/80 transition-colors"
           >
-            CSV
+            Exportar a CSV
           </button>
           <button
             onClick={() => exportPDF('Reporte por Combustible', ['Combustible', 'Precio/L', 'Litros', 'Total', 'Transacciones'], porComb.map(c => [c.nombre, fmt(c.precioLitro), fmtNum(c.litros), fmt(c.total), String(c.transacciones)]), 'reporte_combustibles')}
-            className="px-3 py-1.5 rounded-lg text-xs font-medium bg-danger/10 text-danger hover:bg-danger/20 transition-colors"
+            className="px-3 py-1.5 rounded-lg text-xs font-medium bg-danger text-white hover:bg-danger/80 transition-colors"
           >
-            PDF
+            Exportar a PDF
           </button>
           <button
             onClick={() => setMostrarBinario(!mostrarBinario)}
@@ -170,15 +170,15 @@ export default function Reportes() {
           />
           <button
             onClick={() => exportCSV(porSurt.map(s => ({ Surtidor: s.codigo, Ubicación: s.ubicacion, Estado: s.estado, Ventas: s.total, Litros: s.litros, Transacciones: s.transacciones })), 'reporte_surtidores')}
-            className="px-3 py-1.5 rounded-lg text-xs font-medium bg-success/10 text-success hover:bg-success/20 transition-colors"
+            className="px-3 py-1.5 rounded-lg text-xs font-medium bg-success text-white hover:bg-success/80 transition-colors"
           >
-            CSV
+            Exportar a CSV
           </button>
           <button
             onClick={() => exportPDF('Reporte por Surtidor', ['Surtidor', 'Ubicación', 'Estado', 'Ventas', 'Litros', 'Transacciones'], porSurt.map(s => [s.codigo, s.ubicacion, s.estado, fmt(s.total), fmtNum(s.litros), String(s.transacciones)]), 'reporte_surtidores')}
-            className="px-3 py-1.5 rounded-lg text-xs font-medium bg-danger/10 text-danger hover:bg-danger/20 transition-colors"
+            className="px-3 py-1.5 rounded-lg text-xs font-medium bg-danger text-white hover:bg-danger/80 transition-colors"
           >
-            PDF
+            Exportar a PDF
           </button>
         </div>
       </div>
