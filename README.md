@@ -1,17 +1,17 @@
 # Proyecto Final - Surtidor de Gasolina
 
-![React](https://img.shields.io/badge/React-19-61DAFB?style=flat&logo=react&logoColor=black)
-![Vite](https://img.shields.io/badge/Vite-8-646CFF?style=flat&logo=vite&logoColor=white)
-![TailwindCSS](https://img.shields.io/badge/Tailwind_CSS-4-06B6D4?style=flat&logo=tailwindcss&logoColor=white)
-![Express](https://img.shields.io/badge/Express-4-000000?style=flat&logo=express&logoColor=white)
-![TypeScript](https://img.shields.io/badge/TypeScript-7-3178C6?style=flat&logo=typescript&logoColor=white)
-![Node.js](https://img.shields.io/badge/Node.js-22-339933?style=flat&logo=node.js&logoColor=white)
-![pnpm](https://img.shields.io/badge/pnpm-11-F69220?style=flat&logo=pnpm&logoColor=white)
-![Supabase](https://img.shields.io/badge/Supabase-2-3FCF8E?style=flat&logo=supabase&logoColor=white)
-![Chart.js](https://img.shields.io/badge/Chart.js-4-FF6384?style=flat&logo=chart.js&logoColor=white)
-![Railway](https://img.shields.io/badge/Railway-0B0D0E?style=flat&logo=railway&logoColor=white)
-![Docker](https://img.shields.io/badge/Docker-2496ED?style=flat&logo=docker&logoColor=white)
-![Zod](https://img.shields.io/badge/Zod-4-3068B7?style=flat&logo=zod&logoColor=white)
+![React](https://img.shields.io/badge/React-19-555555?style=flat&labelColor=61DAFB&logo=react&logoColor=white)
+![Vite](https://img.shields.io/badge/Vite-8-555555?style=flat&labelColor=646CFF&logo=vite&logoColor=white)
+![TailwindCSS](https://img.shields.io/badge/Tailwind_CSS-4-555555?style=flat&labelColor=06B6D4&logo=tailwindcss&logoColor=white)
+![Express](https://img.shields.io/badge/Express-4-555555?style=flat&labelColor=000000&logo=express&logoColor=white)
+![TypeScript](https://img.shields.io/badge/TypeScript-7-555555?style=flat&labelColor=3178C6&logo=typescript&logoColor=white)
+![Node.js](https://img.shields.io/badge/Node.js-22-555555?style=flat&labelColor=339933&logo=node.js&logoColor=white)
+![pnpm](https://img.shields.io/badge/pnpm-11-555555?style=flat&labelColor=F69220&logo=pnpm&logoColor=white)
+![Supabase](https://img.shields.io/badge/Supabase-2-555555?style=flat&labelColor=3FCF8E&logo=supabase&logoColor=white)
+![Chart.js](https://img.shields.io/badge/Chart.js-4-555555?style=flat&labelColor=FF6384&logo=chart.js&logoColor=white)
+![Railway](https://img.shields.io/badge/Railway-555555?style=flat&labelColor=0B0D0E&logo=railway&logoColor=white)
+![Docker](https://img.shields.io/badge/Docker-555555?style=flat&labelColor=2496ED&logo=docker&logoColor=white)
+![Zod](https://img.shields.io/badge/Zod-4-555555?style=flat&labelColor=3068B7&logo=zod&logoColor=white)
 
 Sistema web para la gestión de un surtidor de gasolina. Permite registrar ventas diarias, controlar el inventario de combustibles y visualizar reportes a través de un dashboard con gráficas.
 
