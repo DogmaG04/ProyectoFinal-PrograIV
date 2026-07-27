@@ -23,7 +23,7 @@ export default function CriticalAlertsModal({ abierto, alertas, onClose, onIrAle
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
       <div className="absolute inset-0 bg-black/70 animate-fadeIn" onClick={onClose} />
-      <div className="relative bg-surface border-2 border-danger rounded-2xl w-full max-w-[560px] max-h-[85vh] overflow-hidden shadow-[0_0_40px_rgba(248,113,113,0.15)] animate-scaleIn">
+      <div className="relative bg-surface border border-border rounded-2xl w-full max-w-[560px] max-h-[85vh] overflow-hidden animate-scaleIn">
         <div className="px-6 pt-6 pb-4 border-b border-border">
           <div className="flex items-center gap-3 mb-2">
             <div className="w-10 h-10 rounded-full bg-danger-light flex items-center justify-center animate-pulse">
