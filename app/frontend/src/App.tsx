@@ -4,6 +4,7 @@ import Layout from './components/Layout'
 import Login from './components/Login'
 import LoadingScreen from './components/LoadingScreen'
 import ToastContainer from './components/Toast'
+import CriticalAlertsGuard from './components/CriticalAlertsGuard'
 import Dashboard from './views/Dashboard'
 import Surtidores from './views/Surtidores'
 import Ventas from './views/Ventas'
@@ -20,6 +21,7 @@ export default function App() {
 
   const handleLogout = useCallback(() => {
     localStorage.removeItem('loggedIn')
+    localStorage.removeItem('criticalAlertsShown')
     setLoggedIn(false)
   }, [])
 
@@ -46,6 +48,7 @@ export default function App() {
               <Route path="/reportes" element={<Reportes />} />
             </Route>
           </Routes>
+          <CriticalAlertsGuard />
         </BrowserRouter>
         <ToastContainer />
       </AdapterProvider>
