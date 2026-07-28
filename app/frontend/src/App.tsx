@@ -17,16 +17,16 @@ import { ThemeProvider } from './services/ThemeContext'
 const adapter = new SupabaseAdapter()
 
 export default function App() {
-  const [loggedIn, setLoggedIn] = useState(() => localStorage.getItem('loggedIn') === 'true')
+  const [loggedIn, setLoggedIn] = useState(() => sessionStorage.getItem('loggedIn') === 'true')
 
   const handleLogout = useCallback(() => {
-    localStorage.removeItem('loggedIn')
+    sessionStorage.removeItem('loggedIn')
     localStorage.removeItem('criticalAlertsShown')
     setLoggedIn(false)
   }, [])
 
   const handleLogin = useCallback(() => {
-    localStorage.setItem('loggedIn', 'true')
+    sessionStorage.setItem('loggedIn', 'true')
     setLoggedIn(true)
   }, [])
 
