@@ -36,7 +36,7 @@ export default function VoiceButton({
     <button
       onClick={handleClick}
       title={speaking ? 'Detener lectura' : label}
-      className={`inline-flex items-center gap-1.5 rounded-lg font-medium transition-all ${
+      className={`inline-flex items-center gap-1.5 rounded-lg font-medium transition-all shrink-0 ${
         speaking
           ? 'bg-danger/10 text-danger hover:bg-danger/20 animate-pulse'
           : 'bg-primary/10 text-primary hover:bg-primary/20'

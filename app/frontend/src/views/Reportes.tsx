@@ -65,7 +65,7 @@ export default function Reportes() {
     <div>
       <div className="flex flex-wrap justify-between items-center gap-2 mb-4">
         <span className="text-sm md:text-base font-bold text-text">Resumen por Combustible</span>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 flex-wrap">
           <VoiceButton
             text={porComb.map(c => `${c.nombre}: ${fmtNum(c.litros)} litros vendidos, total ${fmt(c.total)}, ${c.transacciones} transacciones`).join('. ')}
             label="Leer resumen"
@@ -162,7 +162,7 @@ export default function Reportes() {
 
       <div className="flex items-center justify-between mb-4">
         <span className="text-sm md:text-base font-bold text-text">Resumen por Surtidor</span>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 flex-wrap">
           <VoiceButton
             text={porSurt.map(s => `${s.codigo} en ${s.ubicacion}: ventas totales ${fmt(s.total)}, ${fmtNum(s.litros)} litros, ${s.transacciones} transacciones`).join('. ')}
             label="Leer resumen"
@@ -186,7 +186,7 @@ export default function Reportes() {
         {porSurt.map(s => (
           <div key={s.id} className="bg-surface border border-border rounded-2xl p-3 sm:p-5">
             <div className="flex items-center justify-between mb-3">
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2 flex-wrap min-w-0">
                 <span className="text-sm font-bold text-subtext uppercase tracking-wide">{s.codigo} — {s.ubicacion}</span>
                 <VoiceButton
                   text={`${s.codigo} en ${s.ubicacion}: ventas totales ${fmt(s.total)}, ${fmtNum(s.litros)} litros, ${s.transacciones} transacciones. Desglose por combustible: ${s.porComb.map(c => `${c.nombre} ${fmtNum(c.litros)} litros ${fmt(c.total)}`).join(', ')}`}

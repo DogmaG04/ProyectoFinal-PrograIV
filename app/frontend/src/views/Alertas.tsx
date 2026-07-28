@@ -150,7 +150,7 @@ export default function Alertas() {
             </button>
           ))}
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 flex-wrap">
           {filtered.length > 0 && (
             <VoiceButton
               text={filtered.map(a => getAlertaTexto(a)).join('. ')}
@@ -203,7 +203,7 @@ export default function Alertas() {
                           <span>{a.timestamp}</span>
                         </div>
                       </div>
-                      <div className="flex items-center gap-2">
+                      <div className="flex items-center gap-2 flex-wrap justify-end">
                         <span className={`text-[11px] font-bold uppercase tracking-wide whitespace-nowrap px-3 py-1 rounded-full ${tagClasses[a.tipo]}`}>
                           {labels[a.tipo]}
                         </span>
